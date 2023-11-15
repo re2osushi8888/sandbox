@@ -27,6 +27,6 @@ class TestMoneyController:
         monkeypatch.setattr('sys.stdin', mock_inputs)
         controller = MoneyController()
         with pytest.raises(ValueError) as e:
-            money = controller.input()
+            controller.input()
         expected = "硬貨・お札は1つずつ入れてください"
         assert str(e.value) == expected
