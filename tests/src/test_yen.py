@@ -15,4 +15,4 @@ class TestYen:
     def test_11円の場合ValueError(self):
         with pytest.raises(ValueError) as e:
             Yen(11)
-        assert e.value == "通貨ではありません"
+        assert str(e.value) == "通貨ではありません"
