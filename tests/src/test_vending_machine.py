@@ -1,6 +1,12 @@
+from src.vending_machine import VendingMachine
+from src.yen import Yen
+
 
 class TestVendingMachine:
-    # def test_円を1つずつ投入できる():
+    def test_10円を投入できる(self):
+        machine = VendingMachine()
+        message = machine.input_yen(Yen(10))
+        assert message == '10円が投入されました'
 
     # def test_通貨にない数字を入力すると投入やり直し():
 
