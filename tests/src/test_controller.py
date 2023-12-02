@@ -21,11 +21,11 @@ class TestMoneyController:
         money: Yen = controller.input()
         assert Yen(100).amount == money.amount
 
-    # def test_11円を投入したらValueError(self, monkeypatch):
-    #     mock_inputs = StringIO('11\n')
-    #     monkeypatch.setattr('sys.stdin', mock_inputs)
-    #     controller = MoneyController()
-    #     with pytest.raises(ValueError) as e:
-    #         controller.input()
-    #     expected = "硬貨・お札は1つずつ入れてください"
-    #     assert str(e.value) == expected
+    def test_11と入力したらValueError(self, monkeypatch):
+        mock_inputs = StringIO('11\n')
+        monkeypatch.setattr('sys.stdin', mock_inputs)
+        controller = MoneyController()
+        with pytest.raises(ValueError) as e:
+            controller.input()
+        expected = "硬貨・お札は1つずつ入れてください"
+        assert str(e.value) == expected
