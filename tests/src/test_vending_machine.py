@@ -37,7 +37,7 @@ class TestVendingMachine:
         machine.input_yen(input_yen_1)
         machine.input_yen(input_yen_2)
         excpected = [input_yen_1, input_yen_2]
-        assert machine.total_amount == excpected
+        assert machine.money_list == excpected
 
 
     # def test_通貨にない数字を入力すると投入やり直し():
