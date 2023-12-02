@@ -73,6 +73,17 @@ class TestVendingMachine:
         finally:
             sys.stdout = sys.__stdout__
 
+    def test_100円と100円を投入し払い戻し操作でmoney_listが空になること(self, ):
+        machine = VendingMachine()
+        yen_1 = Yen(100)
+        yen_2 = Yen(100)
+        machine.input_yen(Yen(10))
+        machine.input_yen(Yen(100))
+        expected = [yen_1, yen_2]
+        assert machine.money_list == expected
+
+        machine.refund()
+        assert machine.money_list == []
 
     # def test_通貨にない数字を入力すると投入やり直し():
 
