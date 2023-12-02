@@ -3,21 +3,23 @@ from src.yen import Yen
 
 
 class TestVendingMachine:
-    def test_10円を投入しmoney_listに保存できる(self):
+    def test_10円を投入するとmoney_listに保存されている(self):
         machine = VendingMachine()
         yen = Yen(10)
         machine.input_yen(yen)
         excpected = [yen]
         assert machine.money_list == excpected
 
-    def test_100円を投入しmoney_listに保存できる(self):
+    def test_500円と100円を投入するとmoney_listに保存されている(self):
         machine = VendingMachine()
-        yen = Yen(100)
-        machine.input_yen(yen)
-        excpected = [yen]
+        yen_1 = Yen(500)
+        yen_2 = Yen(100)
+        machine.input_yen(yen_1)
+        machine.input_yen(yen_2)
+        excpected = [yen_1, yen_2]
         assert machine.money_list == excpected
 
-    def test_500円と1000円を投入し投入金額の総計を取得できる(self):
+    def test_500円と1000円を投入し投入金額の総計をintで取得できる(self):
         machine = VendingMachine()
         machine.input_yen(Yen(500))
         machine.input_yen(Yen(1000))
@@ -25,7 +27,7 @@ class TestVendingMachine:
         excpected = 1500
         assert total_amount == excpected
 
-    def test_100円と10円を投入し投入金額の総計を取得できる(self):
+    def test_100円と10円を投入し投入金額の総計をintで取得できる(self):
         machine = VendingMachine()
         machine.input_yen(Yen(100))
         machine.input_yen(Yen(10))
@@ -33,14 +35,6 @@ class TestVendingMachine:
         excpected = 110
         assert total_amount == excpected
 
-    def test_投入された金額は自動販売機のtotal_amount保存されている(self):
-        machine = VendingMachine()
-        input_yen_1 = Yen(500)
-        input_yen_2 = Yen(100)
-        machine.input_yen(input_yen_1)
-        machine.input_yen(input_yen_2)
-        excpected = [input_yen_1, input_yen_2]
-        assert machine.money_list == excpected
 
 
     # def test_通貨にない数字を入力すると投入やり直し():
