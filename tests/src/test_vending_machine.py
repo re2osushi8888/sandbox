@@ -37,7 +37,7 @@ class TestVendingMachine:
         excpected = 110
         assert machine.fetch_total_amount() == excpected
 
-    def test_1000円と500円を投入し払い戻し操作で投入金額の総計1500円を出力する(self, monkeypatch):
+    def test_1000円と500円を投入し払い戻し操作で総計1500円を出力する(self, monkeypatch):
         # 標準出力をキャプチャするためのストリームを準備
         captured_output = StringIO()
         sys.stdout = captured_output
