@@ -3,6 +3,7 @@ from src.yen import Yen
 
 
 class TestVendingMachine:
+    # TODO: メッセージを返すのではなくtotal_amountに保存する
     def test_10円を投入できる(self):
         machine = VendingMachine()
         message = machine.input_yen(Yen(10))
@@ -21,7 +22,7 @@ class TestVendingMachine:
         excpected = 1500
         assert total_amount == excpected
 
-    def test_投入された金額は自動販売機に保存されている(self):
+    def test_投入された金額は自動販売機のtotal_amount保存されている(self):
         machine = VendingMachine()
         input_yen_1 = Yen(500)
         input_yen_2 = Yen(100)
