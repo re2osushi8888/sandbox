@@ -31,10 +31,8 @@ class TestVendingMachine:
         machine = VendingMachine()
         machine.input_yen(Yen(100))
         machine.input_yen(Yen(10))
-        total_amount: int = machine.fetch_total_amount()
         excpected = 110
-        assert total_amount == excpected
-
+        assert machine.fetch_total_amount() == excpected
 
 
     # def test_通貨にない数字を入力すると投入やり直し():
