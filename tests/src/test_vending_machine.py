@@ -37,7 +37,7 @@ class TestVendingMachine:
         excpected = 110
         assert machine.fetch_total_amount() == excpected
 
-    def test_1000円と500円を投入し払い戻し操作で総計1500円を出力する(self, monkeypatch):
+    def test_1000円と500円を投入し払い戻し操作で総計1500円を出力する(self):
         # 標準出力をキャプチャするためのストリームを準備
         captured_output = StringIO()
         sys.stdout = captured_output
@@ -55,7 +55,7 @@ class TestVendingMachine:
         finally:
             sys.stdout = sys.__stdout__
 
-    def test_10円と100円を投入し払い戻し操作で総計110円を出力する(self, monkeypatch):
+    def test_10円と100円を投入し払い戻し操作で総計110円を出力する(self):
         # 標準出力をキャプチャするためのストリームを準備
         captured_output = StringIO()
         sys.stdout = captured_output
@@ -73,7 +73,7 @@ class TestVendingMachine:
         finally:
             sys.stdout = sys.__stdout__
 
-    def test_100円と100円を投入し払い戻し操作でmoney_listが空になること(self, ):
+    def test_100円と100円を投入し払い戻し操作でmoney_listが空になる(self):
         machine = VendingMachine()
         yen_1 = Yen(100)
         yen_2 = Yen(100)
