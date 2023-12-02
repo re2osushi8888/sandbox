@@ -22,6 +22,14 @@ class TestVendingMachine:
         excpected = 1500
         assert total_amount == excpected
 
+    def test_100円と10円を投入し投入金額の総計を取得できる(self):
+        machine = VendingMachine()
+        machine.input_yen(Yen(100))
+        machine.input_yen(Yen(10))
+        total_amount: int = machine.fetch_total_amount()
+        excpected = 110
+        assert total_amount == excpected
+
     def test_投入された金額は自動販売機のtotal_amount保存されている(self):
         machine = VendingMachine()
         input_yen_1 = Yen(500)
