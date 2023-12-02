@@ -77,8 +77,8 @@ class TestVendingMachine:
         machine = VendingMachine()
         yen_1 = Yen(100)
         yen_2 = Yen(100)
-        machine.input_yen(Yen(10))
-        machine.input_yen(Yen(100))
+        machine.input_yen(yen_1)
+        machine.input_yen(yen_2)
         expected = [yen_1, yen_2]
         assert machine.money_list == expected
 
