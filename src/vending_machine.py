@@ -12,4 +12,7 @@ class VendingMachine:
         return f'{yen.amount}円が投入されました'
 
     def fetch_total_amount(self) -> int:
-        return 1500
+        total_amount = 0
+        for money in self.money_list:
+            total_amount += money.amount
+        return total_amount
