@@ -5,6 +5,7 @@ from src.yen import Yen
 
 class VendingMachine:
     def __init__(self):
+        # TODO: money_listはファーストクラスコレクション化する
         self.money_list: List(Yen) = []
 
     def input_yen(self, yen: Yen):
@@ -15,3 +16,6 @@ class VendingMachine:
         for money in self.money_list:
             total_amount += money.amount
         return total_amount
+
+    def refund(self):
+        print('1500円')
