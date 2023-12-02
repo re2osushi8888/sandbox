@@ -1,3 +1,6 @@
+import sys
+from io import StringIO
+
 from src.vending_machine import VendingMachine
 from src.yen import Yen
 
@@ -34,6 +37,23 @@ class TestVendingMachine:
         excpected = 110
         assert machine.fetch_total_amount() == excpected
 
+    def test_1000円と500円を投入し払い戻し操作で投入金額の総計1500円を出力する(self, monkeypatch):
+        # 標準出力をキャプチャするためのストリームを準備
+        captured_output = StringIO()
+        sys.stdout = captured_output
+
+        machine = VendingMachine()
+        machine.input_yen(Yen(1000))
+        machine.input_yen(Yen(500))
+        try:
+            machine.refund()
+            # TODO: seek()やread()など調べておく
+            captured_output.seek(0)
+            output = captured_output.read().strip()
+            excpected = '1500円'
+            assert output == excpected
+        finally:
+            sys.stdout = sys.__stdout__
 
     # def test_通貨にない数字を入力すると投入やり直し():
 
