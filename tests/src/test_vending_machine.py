@@ -8,6 +8,11 @@ class TestVendingMachine:
         message = machine.input_yen(Yen(10))
         assert message == '10円が投入されました'
 
+    def test_100円を投入できる(self):
+        machine = VendingMachine()
+        message = machine.input_yen(Yen(100))
+        assert message == '100円が投入されました'
+
     # def test_通貨にない数字を入力すると投入やり直し():
 
     # def test_お金の投入を複数回できる():
