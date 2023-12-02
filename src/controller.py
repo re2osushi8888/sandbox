@@ -1,8 +1,10 @@
+from src.yen import Yen
 
 
 class MoneyController:
     def input(self):
-        money = input('お金を投入してください')
-        if money not in ['10', '50', '100', '500', '1000']:
+        money_amount = input('お金を投入してください')
+        if money_amount not in ['10', '50', '100', '500', '1000']:
             raise ValueError('硬貨・お札は1つずつ入れてください')
-        return f'{money}円投入されました'
+        money = Yen(int(money_amount))
+        return money

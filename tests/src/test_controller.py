@@ -7,13 +7,12 @@ from src.yen import Yen
 
 
 class TestMoneyController:
-    def test_10を入力したら10円が返ってくる(self, monkeypatch):
+    def test_10と入力したら10円が返ってくる(self, monkeypatch):
         mock_inputs = StringIO('10\n')
         monkeypatch.setattr('sys.stdin', mock_inputs)
         controller = MoneyController()
         money: Yen = controller.input()
-        expected = Yen(10)
-        assert expected == money
+        assert Yen(10).amount == money.amount
 
     # def test_100円を投入できる(self, monkeypatch):
     #     mock_inputs = StringIO('100\n')
