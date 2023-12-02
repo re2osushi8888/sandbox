@@ -21,6 +21,15 @@ class TestVendingMachine:
         excpected = 1500
         assert total_amount == excpected
 
+    def test_投入された金額は自動販売機に保存されている(self):
+        machine = VendingMachine()
+        input_yen_1 = Yen(500)
+        input_yen_2 = Yen(100)
+        machine.input_yen(input_yen_1)
+        machine.input_yen(input_yen_2)
+        excpected = [input_yen_1, input_yen_2]
+        assert machine.total_amount == excpected
+
 
     # def test_通貨にない数字を入力すると投入やり直し():
 
