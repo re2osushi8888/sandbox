@@ -19,4 +19,5 @@ class VendingMachine:
 
     def refund(self):
         total_amount = self.fetch_total_amount()
+        self.money_list = []
         print(f'{total_amount}円')
