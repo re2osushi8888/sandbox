@@ -3,16 +3,19 @@ from src.yen import Yen
 
 
 class TestVendingMachine:
-    # TODO: メッセージを返すのではなくtotal_amountに保存する
-    def test_10円を投入できる(self):
+    def test_10円を投入しmoney_listに保存できる(self):
         machine = VendingMachine()
-        message = machine.input_yen(Yen(10))
-        assert message == '10円が投入されました'
+        yen = Yen(10)
+        machine.input_yen(yen)
+        excpected = [yen]
+        assert machine.money_list == excpected
 
-    def test_100円を投入できる(self):
+    def test_100円を投入しmoney_listに保存できる(self):
         machine = VendingMachine()
-        message = machine.input_yen(Yen(100))
-        assert message == '100円が投入されました'
+        yen = Yen(100)
+        machine.input_yen(yen)
+        excpected = [yen]
+        assert machine.money_list == excpected
 
     def test_500円と1000円を投入し投入金額の総計を取得できる(self):
         machine = VendingMachine()
