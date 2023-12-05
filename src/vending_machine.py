@@ -1,5 +1,6 @@
 from typing import List
 
+from src.controller import MoneyController
 from src.yen import Yen
 
 
@@ -7,6 +8,7 @@ class VendingMachine:
     def __init__(self):
         # TODO: money_listはファーストクラスコレクション化する
         self.money_list: List(Yen) = []
+        self.controller: MoneyController = MoneyController()
 
     def input_yen(self, yen: Yen):
         self.money_list.append(yen)
@@ -21,3 +23,7 @@ class VendingMachine:
         total_amount = self.fetch_total_amount()
         self.money_list = []
         print(f'{total_amount}円')
+
+    def select_action(self, action_number: int):
+        yen = self.controller.input()
+        self.input_yen(yen)

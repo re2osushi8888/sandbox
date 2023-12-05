@@ -85,6 +85,15 @@ class TestVendingMachine:
         machine.refund()
         assert machine.money_list == []
 
+    def test_行動洗濯で1を入力しCLIで100を入力して100円を投入できる(self, monkeypatch):
+        mock_inputs = StringIO('100\n')
+        monkeypatch.setattr('sys.stdin', mock_inputs)
+
+        machine = VendingMachine()
+        action_number = 1
+        machine.select_action(action_number)
+        assert machine.fetch_total_amount() == 100
+
     # def test_通貨にない数字を入力すると投入やり直し():
 
     # def test_お金の投入を複数回できる():
