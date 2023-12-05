@@ -94,7 +94,7 @@ class TestVendingMachine:
         machine.select_action(action_number)
         assert machine.fetch_total_amount() == 100
 
-    def test_行動選択で2を入力しお金の総計が出力される(self, monkeypatch):
+    def test_行動選択で2を入力しお金の総計が出力される(self):
         captured_output = StringIO()
         sys.stdout = captured_output
 
@@ -102,8 +102,6 @@ class TestVendingMachine:
             machine = VendingMachine()
             machine.input_yen(Yen(100))
 
-            mock_inputs = StringIO('100\n')
-            monkeypatch.setattr('sys.stdin', mock_inputs)
             action_number = 2
             machine.select_action(action_number)
 
@@ -111,9 +109,11 @@ class TestVendingMachine:
             output = captured_output.read().strip()
             excpected = '総計は100円です'
             assert output == excpected
+            assert machine.fetch_total_amount() == 100
         finally:
             sys.stdout = sys.__stdout__
 
+    def test_行動選択で3を入力しお金が払い戻され総計が出力される(self):
 
     # def test_通貨にない数字を入力すると投入やり直し():
 
