@@ -50,7 +50,7 @@ class TestVendingMachine:
             # TODO: seek()やread()など調べておく
             captured_output.seek(0)
             output = captured_output.read().strip()
-            excpected = '1500円'
+            excpected = 'おつりの総計は1500円です'
             assert output == excpected
         finally:
             sys.stdout = sys.__stdout__
@@ -68,7 +68,7 @@ class TestVendingMachine:
             # TODO: seek()やread()など調べておく
             captured_output.seek(0)
             output = captured_output.read().strip()
-            excpected = '110円'
+            excpected = 'おつりの総計は110円です'
             assert output == excpected
         finally:
             sys.stdout = sys.__stdout__
