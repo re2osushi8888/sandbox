@@ -25,5 +25,9 @@ class VendingMachine:
         print(f'{total_amount}円')
 
     def select_action(self, action_number: int):
-        yen = self.controller.input()
-        self.input_yen(yen)
+        if action_number == 1:
+            yen = self.controller.input()
+            self.input_yen(yen)
+        if action_number == 2:
+            total_amount = self.fetch_total_amount()
+            print(f'総計は{total_amount}円です')
