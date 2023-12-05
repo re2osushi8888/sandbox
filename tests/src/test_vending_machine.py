@@ -114,6 +114,28 @@ class TestVendingMachine:
         finally:
             sys.stdout = sys.__stdout__
 
+    def test_行動選択で3を入力しお金が払い戻され総計が出力される(self):
+        captured_output = StringIO()
+        sys.stdout = captured_output
+
+        try:
+            machine = VendingMachine()
+            machine.input_yen(Yen(1000))
+            machine.input_yen(Yen(500))
+            # 自動販売機にお金があることを確認
+            assert machine.fetch_total_amount() == 1500
+
+            action_number = 3
+            machine.select_action(action_number)
+
+            captured_output.seek(0)
+            output = captured_output.read().strip()
+            excpected = 'おつりの総計は1500円です'
+            assert output == excpected
+            # 自動販売機にお金がないことを確認
+            assert machine.fetch_total_amount() == 0
+        finally:
+            sys.stdout = sys.__stdout__
 
     # def test_通貨にない数字を入力すると投入やり直し():
 
