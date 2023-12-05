@@ -109,11 +109,11 @@ class TestVendingMachine:
             output = captured_output.read().strip()
             excpected = '総計は100円です'
             assert output == excpected
+            # 自動販売機にお金が残っていることを確認
             assert machine.fetch_total_amount() == 100
         finally:
             sys.stdout = sys.__stdout__
 
-    def test_行動選択で3を入力しお金が払い戻され総計が出力される(self):
 
     # def test_通貨にない数字を入力すると投入やり直し():
 
