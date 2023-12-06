@@ -35,3 +35,13 @@ class VendingMachine:
         if action_number == 3:
             charge = self.refund()
             print(f'おつりの総計は{charge}円です')
+
+    def start(self):
+        print('起動します')
+        while True:
+            print('\n1: お金を投入')
+            print('2: 投入金額の確認')
+            print('3: 払い戻し')
+            action_number = input(':')
+            self.select_action(int(action_number))
+            print('#######################')
