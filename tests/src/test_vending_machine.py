@@ -37,43 +37,23 @@ class TestVendingMachine:
         excpected = 110
         assert machine.fetch_total_amount() == excpected
 
-    def test_1000円と500円を投入し払い戻し操作で総計1500円を出力する(self):
-        # 標準出力をキャプチャするためのストリームを準備
-        captured_output = StringIO()
-        sys.stdout = captured_output
-
+    def test_1000円と500円を投入し払い戻し操作で総計1500を返す(self):
         machine = VendingMachine()
         machine.input_yen(Yen(1000))
         machine.input_yen(Yen(500))
-        try:
-            machine.refund()
-            # TODO: seek()やread()など調べておく
-            captured_output.seek(0)
-            output = captured_output.read().strip()
-            excpected = 'おつりの総計は1500円です'
-            assert output == excpected
-        finally:
-            sys.stdout = sys.__stdout__
 
-    def test_10円と100円を投入し払い戻し操作で総計110円を出力する(self):
-        # 標準出力をキャプチャするためのストリームを準備
-        captured_output = StringIO()
-        sys.stdout = captured_output
+        change = machine.refund()
+        assert change == 1500
 
+    def test_10円と100円を投入し払い戻し操作で総計110を返す(self):
         machine = VendingMachine()
         machine.input_yen(Yen(10))
         machine.input_yen(Yen(100))
-        try:
-            machine.refund()
-            # TODO: seek()やread()など調べておく
-            captured_output.seek(0)
-            output = captured_output.read().strip()
-            excpected = 'おつりの総計は110円です'
-            assert output == excpected
-        finally:
-            sys.stdout = sys.__stdout__
 
-    def test_100円と100円を投入し払い戻し操作でmoney_listが空になる(self):
+        charge = machine.refund()
+        assert charge == 110
+
+    def test_100円と100円を投入し払い戻し操作でmoney_listが空になり総計200が返ってくる(self):
         machine = VendingMachine()
         yen_1 = Yen(100)
         yen_2 = Yen(100)
@@ -82,7 +62,8 @@ class TestVendingMachine:
         expected = [yen_1, yen_2]
         assert machine.money_list == expected
 
-        machine.refund()
+        charge = machine.refund()
+        assert charge == 200
         assert machine.money_list == []
 
     def test_行動選択で1を入力しCLIで100を入力して100円を投入できる(self, monkeypatch):
