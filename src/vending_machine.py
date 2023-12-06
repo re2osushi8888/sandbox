@@ -20,10 +20,10 @@ class VendingMachine:
         return total_amount
 
     def refund(self):
-        # TODO: お金の金額を返すだけにして出力は外に持たせる
+        """呼び出された時点の合計値を返し、money_listを空にする"""
         total_amount = self.fetch_total_amount()
         self.money_list = []
-        print(f'おつりの総計は{total_amount}円です')
+        return total_amount
 
     def select_action(self, action_number: int):
         if action_number == 1:
@@ -33,4 +33,5 @@ class VendingMachine:
             total_amount = self.fetch_total_amount()
             print(f'総計は{total_amount}円です')
         if action_number == 3:
-            self.refund()
+            charge = self.refund()
+            print(f'おつりの総計は{charge}円です')
