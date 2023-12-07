@@ -3,7 +3,8 @@ from src.yen import Yen
 
 class CliController:
     def input_str_to_int(self):
-        return 10
+        input_str = input()
+        return int(input_str)
 
 
 class MoneyController:
