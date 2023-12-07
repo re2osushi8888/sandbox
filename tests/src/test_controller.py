@@ -23,6 +23,13 @@ class TestCliController:
         num = controller.input_str_to_int()
         assert num == 100
 
+    def test_abcdeと文字列が入力されたときValueError(self):
+        controller = CliController()
+        string = 'abcde'
+        with pytest.raises(ValueError) as e:
+            controller.convert_string_to_int(string)
+        assert str(e.value) == "入力値が不正です"
+
 
 class TestMoneyController:
     def test_10と入力したら10円が返ってくる(self, monkeypatch):
