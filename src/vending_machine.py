@@ -37,6 +37,7 @@ class VendingMachine:
             print(f'おつりの総計は{charge}円です')
 
     def start(self):
+        # TODO: テストどうすればいいのか矢田さん聞く
         print('起動します')
         while True:
             print('\n1: お金を投入')
