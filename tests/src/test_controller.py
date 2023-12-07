@@ -2,8 +2,18 @@ from io import StringIO
 
 import pytest
 
-from src.controller import MoneyController
+from src.controller import CliController, MoneyController
 from src.yen import Yen
+
+
+class TestCliController:
+    def test_strで10と入力したらintの10で返って来る(self, monkeypatch):
+        mock_inputs = StringIO('10\n')
+        monkeypatch.setattr('sys.stdin', mock_inputs)
+
+        controller = CliController()
+        num = controller.input_str_to_int()
+        assert num == 10
 
 
 class TestMoneyController:
@@ -29,3 +39,4 @@ class TestMoneyController:
             controller.input()
         expected = "硬貨・お札は1つずつ入れてください"
         assert str(e.value) == expected
+
