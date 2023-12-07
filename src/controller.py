@@ -1,6 +1,11 @@
 from src.yen import Yen
 
 
+class CliController:
+    def input_str_to_int(self):
+        return 10
+
+
 class MoneyController:
     def input(self):
         money_amount = input('お金を投入してください')
