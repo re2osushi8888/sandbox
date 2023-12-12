@@ -1,3 +1,4 @@
+import time
 from typing import List
 
 from src.controller import CliController
@@ -27,14 +28,19 @@ class VendingMachine:
 
     def select_action(self, action_number: int):
         if action_number == 1:
-            amount = self.controller.input_str_to_int()
+            try:
+                amount = self.controller.input_str_to_int('金額：')
+            except ValueError as e:
+                print('\nエラー：' + str(e))
+                return
             self.input_yen(Yen(amount))
+            print(f'\n{amount}円投入')
         if action_number == 2:
             total_amount = self.fetch_total_amount()
-            print(f'総計は{total_amount}円です')
+            print(f'\n総計は{total_amount}円です')
         if action_number == 3:
             charge = self.refund()
-            print(f'おつりの総計は{charge}円です')
+            print(f'\nおつりの総計は{charge}円です')
 
     def start(self):
         # TODO: テストどうすればいいのか矢田さん聞く
@@ -43,6 +49,11 @@ class VendingMachine:
             print('\n1: お金を投入')
             print('2: 投入金額の確認')
             print('3: 払い戻し')
-            action_number = input(':')
-            self.select_action(int(action_number))
+            try:
+                action_number: int = self.controller.input_str_to_int('数値を入力してください：')
+            except ValueError as e:
+                print('\nエラー：' + str(e))
+                continue
+            self.select_action(action_number)
             print('#######################')
+            time.sleep(1)
