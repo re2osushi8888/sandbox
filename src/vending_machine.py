@@ -1,6 +1,6 @@
 from typing import List
 
-from src.controller import MoneyController
+from src.controller import CliController
 from src.yen import Yen
 
 
@@ -8,7 +8,7 @@ class VendingMachine:
     def __init__(self):
         # TODO: money_listはファーストクラスコレクション化する
         self.money_list: List(Yen) = []
-        self.controller: MoneyController = MoneyController()
+        self.controller = CliController()
 
     def input_yen(self, yen: Yen):
         self.money_list.append(yen)
@@ -27,8 +27,8 @@ class VendingMachine:
 
     def select_action(self, action_number: int):
         if action_number == 1:
-            yen = self.controller.input()
-            self.input_yen(yen)
+            amount = self.controller.input_str_to_int()
+            self.input_yen(Yen(amount))
         if action_number == 2:
             total_amount = self.fetch_total_amount()
             print(f'総計は{total_amount}円です')
