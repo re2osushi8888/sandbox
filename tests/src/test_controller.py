@@ -30,3 +30,17 @@ class TestCliController:
         with pytest.raises(ValueError) as e:
             controller.input_str_to_int()
         assert str(e.value) == "数値で入力してください"
+
+    def test_メッセージ入力するとinput関数の引数に入る(self, monkeypatch):
+        # memo: chatgptに聞いたけど微妙かも..
+        def mock_input(message):
+            assert message == "数字を入力してください："
+            return 10
+
+        monkeypatch.setattr('builtins.input', mock_input)
+
+        controller = CliController()
+        message = '数字を入力してください：'
+        user_input = controller.input_str_to_int(message)
+
+        assert user_input == 10
