@@ -28,7 +28,7 @@ class TestCliController:
         string = 'abcde'
         with pytest.raises(ValueError) as e:
             controller.convert_string_to_int(string)
-        assert str(e.value) == "入力値が不正です"
+        assert str(e.value) == "数値で入力してください"
 
 
 class TestMoneyController:

@@ -6,6 +6,13 @@ class CliController:
         input_str = input()
         return int(input_str)
 
+    def convert_string_to_int(self, input_string: str):
+        try:
+            num = int(input_string)
+            return num
+        except ValueError:
+            raise ValueError('数値で入力してください')
+
 
 class MoneyController:
     def input(self):
