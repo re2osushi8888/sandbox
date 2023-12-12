@@ -1,6 +1,3 @@
-from src.yen import Yen
-
-
 class CliController:
     def input_str_to_int(self):
         "標準入力を受け付ける。数字以外はvalueErrorを返す"
