@@ -23,11 +23,13 @@ class TestCliController:
         num = controller.input_str_to_int()
         assert num == 100
 
-    def test_abcdeと文字列が入力されたときValueError(self):
+    def test_abcdeと文字列が入力されたときValueError(self, monkeypatch):
+        mock_inputs = StringIO('abcde\n')
+        monkeypatch.setattr('sys.stdin', mock_inputs)
+
         controller = CliController()
-        string = 'abcde'
         with pytest.raises(ValueError) as e:
-            controller.convert_string_to_int(string)
+            controller.input_str_to_int()
         assert str(e.value) == "数値で入力してください"
 
 
