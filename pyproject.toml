@@ -2,6 +2,7 @@
 name = "python-dev-container"
 version = "0.1.0"
 python = "3.12"
+requires-python = ">=3.12"
 description = "Add your description here"
 readme = "README.md"
 dependencies = [
@@ -29,3 +30,6 @@ select = [
 
 [tool.ruff.format]
 quote-style = "single"
+
+[tool.mypy]
+disallow_untyped_defs = true
