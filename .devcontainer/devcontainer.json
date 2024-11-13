@@ -9,7 +9,8 @@
 				"pmneo.tsimporter",
 				"yoavbls.pretty-ts-errors",
 				"streetsidesoftware.code-spell-checker",
-				"biomejs.biome"
+				"biomejs.biome",
+				"ms-playwright.playwright"
 			],
 			"settings": {
 				"editor.formatOnSave": true,
