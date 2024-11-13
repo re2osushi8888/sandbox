@@ -11,3 +11,8 @@ $ bunx playwright install-deps
 ```
 $ bunx playwright test
 ```
+
+# codegen
+```
+$ bunx playwright codegen http://localhost:3000
+```
