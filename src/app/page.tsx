@@ -6,6 +6,9 @@ export default function Home() {
 	const changeTo2F = () => {
 		setFloor('2F');
 	};
+	const changeTo1F = () => {
+		setFloor('1F');
+	};
 
 	return (
 		<main>
@@ -15,6 +18,9 @@ export default function Home() {
 			</div>
 			<button type={'button'} onClick={changeTo2F}>
 				下
+			</button>
+			<button type={'button'} onClick={changeTo1F}>
+				上
 			</button>
 		</main>
 	);
