@@ -9,7 +9,7 @@ $ bunx playwright install-deps
 
 # test実行
 ```
-$ bunx playwright test --reporter null
+$ bunx playwright test --reporter list
 ```
 
 # codegen
