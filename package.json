@@ -8,7 +8,8 @@
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint",
-		"e2e-test": "cucumber-js --config cucumber.mjs --exit"
+		"ptest": "playwright test --reporter list",
+		"ctest": "cucumber-js --config cucumber.mjs --exit"
 	},
 	"dependencies": {
 		"next": "15.0.3",

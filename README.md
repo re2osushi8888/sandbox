@@ -9,6 +9,8 @@ $ bunx playwright install-deps
 
 ### test実行
 ```
+$ bun run ptest // playwright test実行
+or
 $ bunx playwright test --reporter list
 ```
 
@@ -20,13 +22,13 @@ $ bunx playwright codegen http://localhost:3000
 ## cucumber
 ### test実行
 ```
-$ bun run e2e-test
+$ bun run ctest
 ```
 
 ### テスト結果のレポートを出す方法
 以下のコマンドを実行し、Reportページが出るURLをブラウザで開く
 ```
-$ bun run e2e-test --publish
+$ bun run ctest --publish
 ```
 
 ## メモ
