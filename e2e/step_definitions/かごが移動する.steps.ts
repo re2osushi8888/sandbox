@@ -8,14 +8,17 @@ Before(async () => {
 	const context = await browser.newContext();
 	page = await context.newPage();
 });
-Given('かごが1階にある', async () => {
+Given('最初のページにアクセスする', async () => {
 	await page.goto('http://localhost:3000');
 });
+Then('階の表示が"1F"になっている', async () => {
+	await expect(page.getByRole('main')).toHaveText(/1F/);
+});
+
 
 When('"下"ボタンを押す', async () => {
 	await page.getByRole('button', { name: '下' }).click();
 });
-
-Then('"2F"と表示される', async () => {
+Then('階の表示が"2F"と表示される', async () => {
 	await expect(page.getByRole('main')).toHaveText(/2F/);
 });
