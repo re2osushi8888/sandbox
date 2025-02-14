@@ -1,7 +1,9 @@
 {
 	"name": "Frontend Container",
 	"image": "mcr.microsoft.com/devcontainers/typescript-node:22",
-	"workspaceFolder": "/workspaces/study-vite-and-react-router",
+	"workspaceFolder": "/workspace",
+	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+	// "workspaceFolder": "/workspaces/study-vite-and-react-router",
 	"customizations": {
 		"vscode": {
 			"extensions": [
