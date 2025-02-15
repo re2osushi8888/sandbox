@@ -9,6 +9,9 @@ export async function loader({ params }: Route.LoaderArgs) {
 
 export default function Contact({ loaderData }: Route.ComponentProps) {
 	const { contact } = loaderData;
+	if (!contact) {
+		throw new Response('Not Found', { status: 404 });
+	}
 
 	return (
 		<div id="contact">
