@@ -1,5 +1,5 @@
 import { Form } from 'react-router';
-import { getContact } from '../data';
+import { type ContactRecord, getContact } from '../data';
 import type { Route } from './+types/contact';
 
 export async function loader({ params }: Route.LoaderArgs) {
