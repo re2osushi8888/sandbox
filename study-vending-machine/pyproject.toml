@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "study-vending-machine"
+version = "0.1.0"
+description = ""
+authors = ["re2osushi8888 <re.2osushi8888@gmail.com>"]
+readme = "README.md"
+packages = [{include = "study_vending_machine"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pytest = "^7.4.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
