@@ -1,0 +1,35 @@
+[project]
+name = "python-dev-container"
+version = "0.1.0"
+python = "3.12"
+requires-python = ">=3.12"
+description = "Add your description here"
+readme = "README.md"
+dependencies = [
+    "ruff>=0.6.8",
+]
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+src = ["src", "test"]
+exclude = [
+    ".git",
+    ".git-rewrite",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".venv",
+]
+
+[tool.ruff.lint]
+select = [
+  "E", # black
+  "F", # Flake8
+  "I", # isort
+]
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.mypy]
+disallow_untyped_defs = true
