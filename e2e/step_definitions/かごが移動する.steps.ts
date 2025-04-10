@@ -4,7 +4,7 @@ import { type Page, chromium, expect } from '@playwright/test';
 let page: Page;
 
 Before(async () => {
-	const browser = await chromium.launch({ headless: false }); // headless: true にするとブラウザが表示されない
+	const browser = await chromium.launch({ headless: true }); // headless: true にするとブラウザが表示されない
 	const context = await browser.newContext();
 	page = await context.newPage();
 });
@@ -14,7 +14,6 @@ Given('最初のページにアクセスする', async () => {
 Then('階の表示が"1F"になっている', async () => {
 	await expect(page.getByRole('main')).toHaveText(/1F/);
 });
-
 
 When('"下"ボタンを押す', async () => {
 	await page.getByRole('button', { name: '下' }).click();
