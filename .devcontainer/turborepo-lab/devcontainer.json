@@ -2,7 +2,7 @@
   "name": "turborepo-lab",
   "dockerComposeFile": ["../../turborepo-lab/docker-compose.local.yml"],
   "service": "apps",
-  "workspaceFolder": "/workspace",
+  "workspaceFolder": "/workspace/turborepo-lab",
   "forwardPorts": [3000, 3001, 5173],
   "customizations": {
     "vscode": {
