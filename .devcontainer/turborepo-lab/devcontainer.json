@@ -1,0 +1,52 @@
+{
+  "name": "turborepo-lab",
+  "dockerComposeFile": ["../../turborepo-lab/docker-compose.local.yml"],
+  "service": "apps",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [3000, 3001, 5173],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.vscode-typescript-next",
+        "pmneo.tsimporter",
+        "yoavbls.pretty-ts-errors",
+        "streetsidesoftware.code-spell-checker",
+        "biomejs.biome",
+        "ms-playwright.playwright",
+        "vitest.explorer",
+        "Prisma.prisma",
+        "humao.rest-client",
+        "ms-azuretools.vscode-docker",
+        "deinsoftware.arrow-function-snippets"
+      ],
+      "settings": {
+        "editor.formatOnSave": false,
+        "files.autoSave": "afterDelay",
+        "files.autoSaveDelay": 1000,
+        "editor.defaultFormatter": "vscode.typescript-language-features",
+        "editor.codeActionsOnSave": {
+          "quickfix.biome": "explicit",
+          "source.organizeImports.biome": "explicit"
+        },
+        "cSpell.ignorePaths": [
+          "**/package.json",
+          "**/settings.json",
+          "**/node_modules/**",
+          "**/vscode-extension/**",
+          "**/.vscode/**",
+          "**/yarn.lock",
+          "**/devcontainer.json",
+          "**/pnpm-lock.yaml"
+        ]
+      }
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/devcontainers-community/npm-features/typescript:1": {},
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers-extra/features/nestjs-cli:2": {},
+    "ghcr.io/robbert229/devcontainer-features/postgresql-client:1": {},
+    "ghcr.io/guiyomh/features/vim:0": {}
+  }
+}

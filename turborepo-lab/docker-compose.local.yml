@@ -1,0 +1,44 @@
+version: "3.8"
+services:
+  apps:
+    container_name: turborepo-lab
+    image: "mcr.microsoft.com/devcontainers/typescript-node:22"
+    command:
+      - /bin/bash
+      - -c
+      - |
+        echo "start..."
+        sleep infinity
+    volumes:
+      - ./:/workspace:cached
+    ports:
+      - 3000:3000
+      - 5173:5173
+    networks:
+      - turborepo-apps-network
+    environment:
+      DATABASE_URL: "postgresql://user:pass@db:5432/database?schema=public"
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17-alpine
+    container_name: turborepo-db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+      POSTGRES_DB: database
+    hostname: db
+    restart: always
+    user: root
+    networks:
+      - turborepo-apps-network
+
+networks:
+  turborepo-apps-network:
+    driver: bridge
+volumes:
+  postgres_data:
