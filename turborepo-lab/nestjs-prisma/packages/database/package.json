@@ -5,13 +5,13 @@
     ".": "./src/client.ts"
   },
   "scripts": {
-    "db:migrate:deploy": "prisma migrate deploy",
-    "db:migrate:dev": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy --schema=./prisma/schema",
+    "db:migrate:dev": "prisma migrate dev -schema=./prisma/schema",
     "db:push": "prisma db push",
     "db:seed": "tsx src/seed.ts",
     "dev": "tsup src/* --watch",
     "format": "prisma format",
-    "generate": "prisma generate",
+    "generate": "prisma generate --schema=./prisma/schema",
     "lint": "eslint . --max-warnings 0",
     "prebuild": "npm run generate",
     "predev": "npm run generate",

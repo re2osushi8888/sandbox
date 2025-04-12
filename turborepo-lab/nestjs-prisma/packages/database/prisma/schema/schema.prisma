@@ -8,12 +8,6 @@ datasource db {
 
 generator client {
   provider = "prisma-client-js"
-  output = "../generated/client"
-}
-
-model User {
-  id            String    @id @default(uuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
+  output = "../../generated/client"
+  previewFeatures = ["prismaSchemaFolder"]
 }

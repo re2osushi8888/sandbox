@@ -9,7 +9,7 @@ export const CreateUserInput =  () => {
   const data = {
     name: `test-user-${suffix}`,
     email: `test-user-${suffix}@example.com`,
-    role: UserRole.LEADER
+    role: UserRole.BBB
   }
 
   return (
