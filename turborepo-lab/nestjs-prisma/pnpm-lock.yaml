@@ -58,6 +58,9 @@ importers:
       '@nestjs/testing':
         specifier: ^11.0.1
         version: 11.0.16(@nestjs/common@11.0.16(file-type@19.6.0)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.0.16)(@nestjs/platform-express@11.0.16)
+      '@repo/database':
+        specifier: workspace:*
+        version: link:../../packages/database
       '@swc/cli':
         specifier: ^0.6.0
         version: 0.6.0(@swc/core@1.11.20)(chokidar@4.0.3)
