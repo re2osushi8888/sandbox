@@ -45,7 +45,7 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - hjq
+      - hjq
 
 tests:
   hjq-test:
@@ -57,3 +57,4 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - hjq
+    - HUnit
