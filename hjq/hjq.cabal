@@ -25,6 +25,9 @@ source-repository head
 
 library
   exposed-modules:
+      Data.Hjq
+      Data.Hjq.Parser
+      Data.Hjq.Query
       Lib
   other-modules:
       Paths_hjq
@@ -35,6 +38,7 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
+    , text
   default-language: Haskell2010
 
 executable hjq-exe
@@ -49,6 +53,7 @@ executable hjq-exe
   build-depends:
       base >=4.7 && <5
     , hjq
+    , text
   default-language: Haskell2010
 
 test-suite hjq-test
@@ -65,4 +70,5 @@ test-suite hjq-test
       HUnit
     , base >=4.7 && <5
     , hjq
+    , text
   default-language: Haskell2010
