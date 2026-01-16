@@ -3,10 +3,12 @@
 module Data.Hjq.Parser (
     JqFilter (..),
     parseJqFilter,
+    JqQuery (..),
+    parseJqQuery,
 ) where
 
 import Control.Applicative ((<|>))
-import Data.Attoparsec.Text (IResult (Done), Parser, Result, char, decimal, digit, endOfInput, feed, letter, many1, parse, skipSpace)
+import Data.Attoparsec.Text (IResult (Done), Parser, Result, char, decimal, digit, endOfInput, feed, letter, many1, parse, sepBy, skipSpace)
 import Data.Text (Text, pack)
 
 data JqFilter
@@ -47,3 +49,27 @@ showParseResult r = Left . pack $ show r
 -- フィールド名などの識別子をパースするパーサ
 word :: Parser Text
 word = fmap pack $ many1 (letter <|> char '-' <|> char '_' <|> digit)
+
+data JqQuery
+    = JqQueryObject [(Text, JqQuery)]
+    | JqQueryArray [JqQuery]
+    | JqQueryFilter JqFilter
+    deriving (Show, Read, Eq)
+
+parseJqQuery :: Text -> Either Text JqQuery
+parseJqQuery s = showParseResult $ parse (jqQueryParser <* endOfInput) s `feed` ""
+
+jqQueryParser :: Parser JqQuery
+jqQueryParser = queryArray <|> queryFilter <|> queryObject
+  where
+    queryArray :: Parser JqQuery
+    queryArray = JqQueryArray <$> (schar '[' *> jqQueryParser `sepBy` (schar ',') <* schar ']')
+
+    queryObject :: Parser JqQuery
+    queryObject = JqQueryObject <$> (schar '{' *> (qObj `sepBy` schar ',') <* schar '}')
+
+    qObj :: Parser (Text, JqQuery)
+    qObj = (,) <$> (schar '"' *> word <* schar '"') <*> (schar ':' *> jqQueryParser)
+
+    queryFilter :: Parser JqQuery
+    queryFilter = JqQueryFilter <$> jqFilterParser
