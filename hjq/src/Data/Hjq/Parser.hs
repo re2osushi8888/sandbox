@@ -5,11 +5,17 @@ module Data.Hjq.Parser (
     parseJqFilter,
     JqQuery (..),
     parseJqQuery,
+    unsafeParseFilter,
+    applyFilter,
 ) where
 
 import Control.Applicative ((<|>))
+import Control.Lens ((^.), (^?))
+import Control.Monad (join)
+import Data.Aeson (Value (..))
+import Data.Aeson.Lens (key, nth, _Key)
 import Data.Attoparsec.Text (IResult (Done), Parser, Result, char, decimal, digit, endOfInput, feed, letter, many1, parse, sepBy, skipSpace)
-import Data.Text (Text, pack)
+import Data.Text (Text, pack, unpack)
 
 data JqFilter
     = JqField Text JqFilter
@@ -73,3 +79,27 @@ jqQueryParser = queryArray <|> queryFilter <|> queryObject
 
     queryFilter :: Parser JqQuery
     queryFilter = JqQueryFilter <$> jqFilterParser
+
+unsafeParseFilter :: Text -> JqFilter
+unsafeParseFilter t = case parseJqFilter t of
+    Right f -> f
+    Left s -> error $ "PARSE FAILURE IN A TEST : " ++ unpack s
+
+applyFilter :: JqFilter -> Value -> Either Text Value
+applyFilter (JqField fieldName n) obj@(Object _) =
+    join $ noteNotFoundError fieldName (fmap (applyFilter n) (obj ^? key (fieldName ^. _Key)))
+applyFilter (JqIndex index n) array@(Array _) =
+    join $ noteOutOfRangeError index (fmap (applyFilter n) (array ^? nth index))
+applyFilter JqNil v = Right v
+applyFilter f o = Left $ "unexpected pattern : " <> tshow f <> " : " <> tshow o
+
+noteNotFoundError :: Text -> Maybe a -> Either Text a
+noteNotFoundError _ (Just x) = Right x
+noteNotFoundError s Nothing = Left $ "field name not found " <> s
+
+noteOutOfRangeError :: Int -> Maybe a -> Either Text a
+noteOutOfRangeError _ (Just x) = Right x
+noteOutOfRangeError s Nothing = Left $ "out of range : " <> tshow s
+
+tshow :: (Show a) => a -> Text
+tshow = pack . show

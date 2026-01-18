@@ -37,9 +37,14 @@ library
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      attoparsec
+      aeson
+    , attoparsec
     , base >=4.7 && <5
+    , lens
+    , lens-aeson
     , text
+    , unordered-containers
+    , vector
   default-language: Haskell2010
 
 executable hjq-exe
@@ -52,10 +57,15 @@ executable hjq-exe
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      attoparsec
+      aeson
+    , attoparsec
     , base >=4.7 && <5
     , hjq
+    , lens
+    , lens-aeson
     , text
+    , unordered-containers
+    , vector
   default-language: Haskell2010
 
 test-suite hjq-test
@@ -70,8 +80,13 @@ test-suite hjq-test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       HUnit
+    , aeson
     , attoparsec
     , base >=4.7 && <5
     , hjq
+    , lens
+    , lens-aeson
     , text
+    , unordered-containers
+    , vector
   default-language: Haskell2010

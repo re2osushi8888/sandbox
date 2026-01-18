@@ -2,8 +2,13 @@
 
 module Main (main) where
 
-import Data.Hjq.Parser (JqFilter (..), JqQuery (..), parseJqFilter, parseJqQuery)
+import Control.Lens ((^?))
+import Data.Aeson (Value (..))
+import qualified Data.Aeson.KeyMap as KM
+import Data.Aeson.Lens (key, nth)
+import Data.Hjq.Parser (JqFilter (..), JqQuery (..), applyFilter, parseJqFilter, parseJqQuery, unsafeParseFilter)
 import Data.Text ()
+import qualified Data.Vector as V
 import Test.HUnit (Test (TestList), runTestTT, (~:), (~?=))
 
 main :: IO ()
@@ -14,6 +19,7 @@ main = do
                 [ jqFilterParserTest
                 , jqQueryParserTest
                 , jqQueryParserSpaceTest
+                , applyFilterTest
                 -- テストケースが増えたら追加していく
                 ]
     return ()
@@ -80,4 +86,57 @@ jqQueryParserSpaceTest =
         , "jqQueryParser space test 3"
             ~: parseJqQuery "{ \"hoge\" : [ ] , \"piyo\" : [ ] }"
             ~?= Right (JqQueryObject [("hoge", JqQueryArray []), ("piyo", JqQueryArray [])])
+        ]
+
+testData :: Value
+testData =
+    Object $
+        KM.fromList
+            [ ("string-field", String "string value")
+            ,
+                ( "nested-field"
+                , Object $
+                    KM.fromList
+                        [ ("inner-string", String "inner value")
+                        , ("inner-number", Number 100)
+                        ]
+                )
+            ,
+                ( "array-field"
+                , Array $
+                    V.fromList
+                        [ String "first field"
+                        , String "next field"
+                        , Object
+                            ( KM.fromList
+                                [("object-in-array", String "string value in object-in-array")]
+                            )
+                        ]
+                )
+            ]
+
+applyFilterTest :: Test
+applyFilterTest =
+    TestList
+        [ "applyFilter test1"
+            ~: applyFilter (unsafeParseFilter ".") testData
+            ~?= Right testData
+        , "applyFilter test2"
+            ~: (Just $ applyFilter (unsafeParseFilter ".string-field") testData)
+            ~?= fmap Right (testData ^? key "string-field")
+        , "applyFilter test3"
+            ~: (Just $ applyFilter (unsafeParseFilter ".nested-field.inner-string") testData)
+            ~?= fmap Right (testData ^? key "nested-field" . key "inner-string")
+        , "applyFilter test4"
+            ~: (Just $ applyFilter (unsafeParseFilter ".nested-field.inner-number") testData)
+            ~?= fmap Right (testData ^? key "nested-field" . key "inner-number")
+        , "applyFilter test5"
+            ~: (Just $ applyFilter (unsafeParseFilter ".array-field[0]") testData)
+            ~?= fmap Right (testData ^? key "array-field" . nth 0)
+        , "applyFilter test6"
+            ~: (Just $ applyFilter (unsafeParseFilter ".array-field[1]") testData)
+            ~?= fmap Right (testData ^? key "array-field" . nth 1)
+        , "applyFilter test7"
+            ~: (Just $ applyFilter (unsafeParseFilter ".array-field[2]") testData)
+            ~?= fmap Right (testData ^? key "array-field" . nth 2)
         ]

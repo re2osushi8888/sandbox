@@ -23,6 +23,11 @@ dependencies:
 - base >= 4.7 && < 5
 - text
 - attoparsec
+- lens-aeson
+- vector
+- unordered-containers
+- aeson
+- lens
 
 ghc-options:
 - -Wall
