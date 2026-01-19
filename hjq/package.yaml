@@ -28,6 +28,9 @@ dependencies:
 - unordered-containers
 - aeson
 - lens
+- bytestring
+- errors
+- aeson-pretty
 
 ghc-options:
 - -Wall
