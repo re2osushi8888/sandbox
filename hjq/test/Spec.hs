@@ -6,8 +6,8 @@ import Control.Lens ((^?))
 import Data.Aeson (Value (..))
 import qualified Data.Aeson.KeyMap as KM
 import Data.Aeson.Lens (key, nth)
-import Data.Hjq.Parser (JqFilter (..), JqQuery (..), applyFilter, parseJqFilter, parseJqQuery, unsafeParseFilter)
-import Data.Text ()
+import Data.Hjq.Parser (JqFilter (..), JqQuery (..), applyFilter, executeQuery, parseJqFilter, parseJqQuery, unsafeParseFilter)
+import Data.Text (Text, unpack)
 import qualified Data.Vector as V
 import Test.HUnit (Test (TestList), runTestTT, (~:), (~?=))
 
@@ -20,6 +20,7 @@ main = do
                 , jqQueryParserTest
                 , jqQueryParserSpaceTest
                 , applyFilterTest
+                , executeQueryTest
                 -- テストケースが増えたら追加していく
                 ]
     return ()
@@ -140,3 +141,22 @@ applyFilterTest =
             ~: (Just $ applyFilter (unsafeParseFilter ".array-field[2]") testData)
             ~?= fmap Right (testData ^? key "array-field" . nth 2)
         ]
+
+executeQueryTest :: Test
+executeQueryTest =
+    TestList
+        [ "executeQuery test 1"
+            ~: executeQuery (unsafeParseQuery "{}") testData
+            ~?= Right (Object $ KM.fromList [])
+        , "executeQuery test 2"
+            ~: executeQuery (unsafeParseQuery "{ \"field1\": . , \"field2\": .string-field}") testData
+            ~?= Right (Object $ KM.fromList [("field1", testData), ("field2", String "string value")])
+        , "executeQuery test 3"
+            ~: executeQuery (unsafeParseQuery "[ .string-field, .nested-field.inner-string]") testData
+            ~?= Right (Array $ V.fromList [String "string value", String "inner value"])
+        ]
+
+unsafeParseQuery :: Text -> JqQuery
+unsafeParseQuery t = case parseJqQuery t of
+    Right q -> q
+    Left s -> error $ "PARSE FAILURE IN A TEST : " ++ unpack s

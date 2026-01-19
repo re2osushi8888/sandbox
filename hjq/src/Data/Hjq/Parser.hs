@@ -7,15 +7,19 @@ module Data.Hjq.Parser (
     parseJqQuery,
     unsafeParseFilter,
     applyFilter,
+    executeQuery,
 ) where
 
 import Control.Applicative ((<|>))
 import Control.Lens ((^.), (^?))
 import Control.Monad (join)
 import Data.Aeson (Value (..))
+import qualified Data.Aeson.Key as K
+import qualified Data.Aeson.KeyMap as KM
 import Data.Aeson.Lens (key, nth, _Key)
 import Data.Attoparsec.Text (IResult (Done), Parser, Result, char, decimal, digit, endOfInput, feed, letter, many1, parse, sepBy, skipSpace)
 import Data.Text (Text, pack, unpack)
+import qualified Data.Vector as V
 
 data JqFilter
     = JqField Text JqFilter
@@ -103,3 +107,13 @@ noteOutOfRangeError s Nothing = Left $ "out of range : " <> tshow s
 
 tshow :: (Show a) => a -> Text
 tshow = pack . show
+
+executeQuery :: JqQuery -> Value -> Either Text Value
+executeQuery (JqQueryObject o) v =
+    fmap (Object . KM.fromList)
+        . sequence
+        . fmap sequence
+        $ fmap (\(kTxt, q) -> (K.fromText kTxt, executeQuery q v)) o
+executeQuery (JqQueryArray l) v =
+    fmap (Array . V.fromList) . sequence $ fmap (flip executeQuery v) l
+executeQuery (JqQueryFilter f) v = applyFilter f v
