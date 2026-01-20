@@ -6,7 +6,8 @@ import Control.Lens ((^?))
 import Data.Aeson (Value (..))
 import qualified Data.Aeson.KeyMap as KM
 import Data.Aeson.Lens (key, nth)
-import Data.Hjq.Parser (JqFilter (..), JqQuery (..), applyFilter, executeQuery, parseJqFilter, parseJqQuery, unsafeParseFilter)
+import Data.Hjq.Parser
+import Data.Hjq.Query
 import Data.Text (Text, unpack)
 import qualified Data.Vector as V
 import Test.HUnit (Test (TestList), runTestTT, (~:), (~?=))
