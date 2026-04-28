@@ -1,0 +1,18 @@
+/home/r-yamamoto/.ghcup/ghc/9.10.3/lib/ghc-9.10.3/lib/x86_64-linux-ghc-9.10.3/rts-1.0.2/include/ghcversion.h:
+  hash: 7590ea01e313d089c303211ba85b0e4454627be40dcb88be287ed32f7e97187f
+? /home/r-yamamoto/repos/github.com/re2osushi8888/sandbox/hjq/.stack-work/dist/x86_64-linux/ghc-9.10.3/build/hjq-test/autogen/Paths_hjq.hs
+: hash: 31ea13bfda355a02672d719a5106e5d52102f6438157e00dea90607acc54802f
+? /home/r-yamamoto/repos/github.com/re2osushi8888/sandbox/hjq/.stack-work/dist/x86_64-linux/ghc-9.10.3/build/hjq-test/autogen/cabal_macros.h
+: hash: 7ce687b8c9f86baa9860ef26065530ac388b1c78f99b696f32cc5737f9c92473
+/home/r-yamamoto/repos/github.com/re2osushi8888/sandbox/hjq/CHANGELOG.md:
+  hash: 801d97809c79d8873ccaeaf00989a6d5097dbdbab6e3adb5b84391cd3da5cee8
+/home/r-yamamoto/repos/github.com/re2osushi8888/sandbox/hjq/README.md:
+  hash: def479864c19d297d43765c7d7ad4b71198d995dbee47be4ec083e89764e82dc
+/home/r-yamamoto/repos/github.com/re2osushi8888/sandbox/hjq/hjq.cabal:
+  hash: aabcb94c7efb34a1f534f2d335b780966ed55ad64fc60560e72630888a25b8cd
+/home/r-yamamoto/repos/github.com/re2osushi8888/sandbox/hjq/package.yaml:
+  hash: 7371e14dcd4fa5e54ef48fed0ba60fb9e03005d19d811901e94328f993d93c10
+/home/r-yamamoto/repos/github.com/re2osushi8888/sandbox/hjq/test/Spec.hs:
+  hash: 47b4afe299e84f06f4121819c4812de2bc7be02859b61aea9974c1fbfad2e40d
+/usr/include/stdc-predef.h:
+  hash: 8db4f65e62cade8ae4d9b77960ee6aee093255acc1b637e3fb37d79179733b15
