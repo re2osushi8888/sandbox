@@ -32,6 +32,7 @@
             hpkgs.ghc
             hpkgs.haskell-language-server
             hpkgs.fourmolu
+            hpkgs.hoogle
             fmt
             run
             actest
