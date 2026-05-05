@@ -13,6 +13,7 @@
         hpkgs = pkgs.haskellPackages;
         fmt = pkgs.writeShellScriptBin "fmt" "fourmolu --mode inplace \"$@\"";
         run = pkgs.writeShellScriptBin "run" "runghc \"$@\"";
+        actest = pkgs.writeShellScriptBin "actest" "oj test -c \"runghc Main.hs\" -d tests/ \"$@\"";
         atcoder-cli = pkgs.buildNpmPackage {
           pname = "atcoder-cli";
           version = "2.2.0";
@@ -33,7 +34,9 @@
             hpkgs.fourmolu
             fmt
             run
+            actest
             atcoder-cli
+            pkgs.online-judge-tools
           ];
         };
       });
