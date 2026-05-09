@@ -3,5 +3,5 @@
 main :: IO ()
 main = do
     x <- readLn :: IO Int
-    let (s, a) = divMod x 5
+    let a = mod x 5
     if a < 3 then print (x - a) else print (x - a + 5)
