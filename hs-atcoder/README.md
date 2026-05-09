@@ -12,7 +12,7 @@ nix develop  # または direnv を使っていれば自動で入る
 
 | コマンド | 内容 |
 |---------|------|
-| `fmt <file>` | fourmolu でフォーマット |
+| `hfmt <file>` | fourmolu でフォーマット |
 | `run <file>` | runghc で実行 |
 | `acc` | AtCoder CLI |
 | `oj` | Online Judge Tools |

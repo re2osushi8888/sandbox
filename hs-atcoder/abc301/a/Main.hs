@@ -12,7 +12,7 @@ main :: IO ()
 main = do
     input <- getContents
     let (_nLine : sLine : _) = lines input
-        _n = read _nLine :: Int
+        n = read _nLine :: Int
         s = sLine :: String
 
     putStrLn $ judge s

@@ -11,7 +11,7 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
         hpkgs = pkgs.haskellPackages;
-        fmt = pkgs.writeShellScriptBin "fmt" "fourmolu --mode inplace \"$@\"";
+        hfmt = pkgs.writeShellScriptBin "hfmt" "fourmolu --mode inplace \"$@\"";
         run = pkgs.writeShellScriptBin "run" "runghc \"$@\"";
         actest = pkgs.writeShellScriptBin "actest" "oj test -c \"runghc Main.hs\" -d tests/ \"$@\"";
         atcoder-cli = pkgs.buildNpmPackage {
@@ -33,7 +33,7 @@
             hpkgs.haskell-language-server
             hpkgs.fourmolu
             hpkgs.hoogle
-            fmt
+            hfmt
             run
             actest
             atcoder-cli
