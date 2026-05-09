@@ -24,6 +24,12 @@
             hash  = "sha256-7pbCTgWt+khKVyMV03HanvuOX2uAC0PL9OLmqly7IWE=";
           };
           npmDepsHash = "sha256-ufG7Fq5D2SOzUp8KYRYUB5tYJYoADuhK+2zDfG0a3ks=";
+          npmInstallFlags = [
+            "--omit=optional"
+          ];
+          npmRebuildFlags = [
+            "--omit=optional"
+          ];
           NODE_OPTIONS = "--openssl-legacy-provider";
         };
       in {
