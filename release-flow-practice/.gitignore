@@ -9,9 +9,12 @@ dist/
 .vite/
 
 # Environment
+# .env.enc は SOPS で暗号化した上で Git 管理する（ADR-0002 参照）。
+# 復号後の実ファイルである .env のみ除外する。
 .env
-.env.local
-.env.*.local
+
+# SOPS/age の秘密鍵（絶対に Git 管理しない。安全なチャネルでチーム共有する）
+key.txt
 
 # IDE
 .vscode/

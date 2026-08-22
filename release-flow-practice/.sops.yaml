@@ -1,0 +1,23 @@
+# SOPS 設定ファイル（ADR-0002 参照）
+#
+# ローカル開発用の .env.enc のみを age 鍵で暗号化する。
+# staging / production の機密情報は GCP Secret Manager で管理し、Git には置かない。
+#
+# .enc サフィックスは SOPS 公式ドキュメントでも「拡張子を変更する場合の例」として
+# 使われている書き方（https://getsops.io/docs/reference/）。ただし本来のフォーマット
+# 情報が拡張子から失われるため、復号時は --input-type/--output-type を明示する必要がある。
+#
+# セットアップ手順:
+#   1. mise install                  # sops / age / gcloud をインストール
+#   2. mise exec -- age-keygen -o key.txt  # チームの鍵ペアを一度だけ生成
+#   3. 出力された public key を下記 age: に設定
+#   4. 秘密鍵（key.txt）は Git に含めず、安全なチャネルでチーム内共有する
+#
+# 暗号化: mise run env:encrypt
+# 復号:   mise run env:decrypt
+#
+# タスク定義は .mise.toml を参照。
+
+creation_rules:
+  - path_regex: \.env\.enc$
+    age: age1l3llaa6y78q7tdsufenuhg3pg9f5z3c0tku4fy3ex7zg4jswsfesvdtvpd

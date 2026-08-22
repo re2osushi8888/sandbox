@@ -1,8 +1,63 @@
-[env]
-# 環境変数設定（必要に応じて）
+# CLI ツールのバージョン固定と、機密情報・ビルド関連タスクの実行専用（ADR-0002 参照）
+# ランタイム（Bun）の管理には使わない。sops / age / gcloud のバージョンのみを揃える。
 
 [tools]
-node = "24.19.0"
-npm = "11.17.0"
+sops = "3.13.3"
+age = "1.3.1"
+gcloud = "581.0.0"
 
-[tasks]
+[tasks."env:encrypt"]
+description = "平文の .env.enc を初めて SOPS + age で暗号化する（既に暗号化済みの場合は env:edit を使うこと）"
+run = '''
+#!/bin/bash
+set -e
+if grep -q '^sops_version=' .env.enc 2>/dev/null; then
+  echo "⚠️  .env.enc is already encrypted. Use 'mise run env:edit' to modify it instead."
+  exit 1
+fi
+sops --input-type dotenv --output-type dotenv -e -i .env.enc
+'''
+
+[tasks."env:decrypt"]
+description = ".env.enc を復号してローカル用の .env を生成する"
+run = "sops -d --input-type dotenv --output-type dotenv .env.enc > .env"
+env = { SOPS_AGE_KEY_FILE = "./key.txt" }
+
+[tasks."env:edit"]
+description = ".env.enc を $EDITOR で直接編集する（保存時に自動で再暗号化。編集後は env:decrypt と commit を忘れずに）"
+run = '''
+#!/bin/bash
+set -e
+sops --input-type dotenv --output-type dotenv .env.enc
+echo
+echo "Next steps:"
+echo "  1. mise run env:decrypt   # .env に反映（.env.enc を編集しただけでは .env は更新されない）"
+echo "  2. git add .env.enc && git commit"
+'''
+env = { SOPS_AGE_KEY_FILE = "./key.txt" }
+
+[tasks.build]
+description = "Docker イメージをビルドする（.env の VERSION / Git SHA / ビルド時刻を注入）"
+run = '''
+#!/bin/bash
+set -e
+if [ -f ".env" ]; then
+  set -a
+  source .env
+  set +a
+fi
+VERSION=${VERSION:-dev}
+GIT_SHA=$(git rev-parse --short HEAD)
+BUILD_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+echo "Building Docker image..."
+echo "  VERSION=$VERSION"
+echo "  GIT_SHA=$GIT_SHA"
+echo "  BUILD_TIME=$BUILD_TIME"
+docker build \
+  --build-arg VERSION=$VERSION \
+  --build-arg GIT_SHA=$GIT_SHA \
+  --build-arg BUILD_TIME=$BUILD_TIME \
+  -t myapp:$VERSION \
+  -t myapp:$GIT_SHA \
+  ./api
+'''
