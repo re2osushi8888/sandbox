@@ -1,6 +1,6 @@
 # Release Flow Practice
 
-リリース戦略とバージョン管理を実践的に学ぶプロジェクト。Blue-greenデプロイ、カナリアリリース、Docker/package.jsonのバージョン管理を GCP Cloud Run で実装・練習します。
+リリース戦略とバージョン管理を実践的に学ぶプロジェクト。Blue-Green デプロイ、カナリアリリース、バージョン管理を GCP Cloud Run で実装・練習します。
 
 ## 概要
 
@@ -8,13 +8,15 @@
 
 - **Blue-Green デプロイ**: 本番環境と同一の環境を並行実行して、ゼロダウンタイムでスイッチオーバー
 - **カナリアリリース**: 新バージョンを段階的にロールアウトしてリスク最小化
-- **バージョン管理**: Docker イメージと package.json の統一的なバージョン戦略
+- **バージョン管理**: Git tag を単一の真実の源とし、ビルド時に Docker イメージへ焼き込む戦略
+
+詳細な設計方針は [ADR-0001: バージョン情報の管理元と実行時への伝播方式](docs/adr/0001-version-management-approach.md) を参照。
 
 ## 技術スタック
 
 - **API フレームワーク**: [Hono](https://hono.dev/)（軽量な Web フレームワーク）
-- **ランタイム**: Node.js
-- **コンテナ化**: Docker
+- **ランタイム**: [Bun](https://bun.sh/)（JavaScript ランタイム）
+- **コンテナ化**: Docker（`oven/bun:1.4.0-alpine`）
 - **デプロイメント先**: GCP Cloud Run
 - **バージョン管理**: Git タグ + Semantic Versioning
 
@@ -40,9 +42,32 @@ release-flow-practice/
 
 ### 前提条件
 
-- Node.js 18+
+- Bun
 - Docker
-- gcloud CLI（GCP プロジェクト設定済み）
+- [mise](https://mise.jdx.dev/)（`sops` / `age` / `gcloud` のバージョン管理用。ランタイムの管理には使わない）
+
+### 機密情報のセットアップ（新しい PC で clone した場合）
+
+機密情報を含む環境変数は SOPS + age で暗号化して `.env.enc` として Git 管理している（[ADR-0002](docs/adr/0002-secret-management-strategy.md) 参照、仕組みの詳細は [docs/sops-and-age.md](docs/sops-and-age.md)）。復号には age の秘密鍵が必要で、これは Git に含まれていないため別途チームから受け取る必要がある。
+
+```bash
+# 1. リポジトリを clone
+git clone <repository-url>
+cd release-flow-practice
+
+# 2. sops / age / gcloud をインストール（.mise.toml でバージョン固定済み）
+mise install
+
+# 3. チームメンバーから age の秘密鍵（key.txt）を安全なチャネル
+#    （1Password、Slack DM 等）で受け取り、プロジェクトルートに配置する
+#    ※ key.txt は .gitignore 対象。誰かに渡す/受け取る以外の方法で
+#      入手することはできない
+
+# 4. .env.enc を復号して .env を生成
+mise run env:decrypt
+```
+
+これで `.env` が生成され、`bun run dev` や `mise run build` から利用できる状態になる。
 
 ### ローカルセットアップ
 
@@ -51,10 +76,13 @@ release-flow-practice/
 cd api
 
 # 依存関係をインストール
-npm install
+bun install
 
-# ローカルで実行
-npm run dev
+# ローカルで実行（デフォルトで http://localhost:4000）
+bun run dev
+
+# ポートを変更する場合
+PORT=5000 bun run dev
 ```
 
 ## デプロイメント戦略
@@ -95,25 +123,22 @@ npm run dev
 
 ## バージョン管理戦略
 
-### package.json と Docker イメージの同期
-
-```json
-{
-  "version": "1.2.0",
-  "name": "release-flow-api"
-}
-```
+Git tag を単一の真実の源とし、ビルド時に Docker イメージへ `VERSION` / `GIT_SHA` / `BUILD_TIME` を焼き込みます。詳細は [ADR-0001](docs/adr/0001-version-management-approach.md) を参照。
 
 ```dockerfile
-FROM node:18.19.0-alpine
-LABEL version="1.2.0"
+ARG VERSION=dev
+ARG GIT_SHA=unknown
+ARG BUILD_TIME=unknown
+
+ENV APP_VERSION=$VERSION \
+    APP_GIT_SHA=$GIT_SHA \
+    APP_BUILD_TIME=$BUILD_TIME
 ```
 
 バージョン更新フロー：
-1. `package.json` の version を更新
-2. Docker イメージをビルド（同じバージョンでタグ付け）
-3. Git タグを作成（`v1.2.0`）
-4. Cloud Run にデプロイ
+1. Git タグを作成（`v1.2.0`）
+2. `scripts/build.sh` で Docker イメージをビルド（タグから VERSION を注入）
+3. Cloud Run にデプロイ
 
 ### Semantic Versioning
 
@@ -128,24 +153,46 @@ LABEL version="1.2.0"
 
 ```bash
 cd api
-npm run dev
+bun run dev
 ```
 
-API が `http://localhost:8000` で起動します。
+API が `http://localhost:4000` で起動します。
 
 ### API の確認
 
 ```bash
-curl http://localhost:8000/
-curl http://localhost:8000/health
+curl http://localhost:4000/
+curl http://localhost:4000/health
+curl http://localhost:4000/version
 ```
 
 ### Docker イメージのビルド
 
+`VERSION` は `.env.enc`（SOPS + age で暗号化して Git 管理、[ADR-0002](docs/adr/0002-secret-management-strategy.md) 参照）に保持し、復号した `.env` から `mise run build` タスクが読み込みます（Git SHA とビルド時刻は自動取得）。詳しい暗号化の仕組みは [docs/sops-and-age.md](docs/sops-and-age.md) を参照。
+
+miseの`sops` / `age` / `gcloud`と各タスクの定義は`.mise.toml`にある。
+
+```bash
+# 初回セットアップ（チームで共有された age 秘密鍵 key.txt を配置済みの前提）
+mise run env:decrypt   # .env.enc を復号して .env を生成
+
+# ビルド（プロジェクトルートから実行、.env の VERSION を使う）
+mise run build
+
+# .env.enc の内容を変更した場合は再暗号化してからコミット
+mise run env:encrypt
+```
+
+内部的には以下と同等の処理を行います：
+
 ```bash
 cd api
-docker build -t release-flow-api:v1.0.0 .
-docker run -p 8000:8000 release-flow-api:v1.0.0
+docker build \
+  --build-arg VERSION=v0.1.0 \
+  --build-arg GIT_SHA=$(git rev-parse --short HEAD) \
+  --build-arg BUILD_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
+  -t release-flow-api:v0.1.0 .
+docker run -p 4000:4000 release-flow-api:v0.1.0
 ```
 
 ## GCP Cloud Run へのデプロイ
