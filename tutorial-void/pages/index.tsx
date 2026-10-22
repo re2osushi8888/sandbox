@@ -1,6 +1,17 @@
 import { action, Form, useForm } from "@void/react";
+import { LogOut, Trash2 } from "lucide-react";
 import { useEffect, useState, type SubmitEvent } from "react";
 import { auth } from "void/client";
+import { Button } from "../src/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../src/components/ui/card";
+import { Input } from "../src/components/ui/input";
+import { Label } from "../src/components/ui/label";
 import type { Props } from "./index.server";
 
 export default function TodoPage({ user, isAdmin, todos }: Props) {
@@ -46,54 +57,58 @@ function AuthForm() {
   }
 
   return (
-    <main
-      style={{ maxWidth: 360, margin: "2rem auto", padding: "0 16px", fontFamily: "sans-serif" }}
-    >
-      <h1>{mode === "signIn" ? "ログイン" : "新規登録"}</h1>
+    <main className="mx-auto flex min-h-screen max-w-sm items-center px-4">
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-xl">{mode === "signIn" ? "ログイン" : "新規登録"}</CardTitle>
+          <CardDescription>
+            {mode === "signIn"
+              ? "Todo を使うにはログインしてください"
+              : "招待されたメールアドレスで登録できます"}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={submit} className="grid gap-4">
+            {mode === "signUp" && (
+              <div className="grid gap-2">
+                <Label htmlFor="name">名前</Label>
+                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
+              </div>
+            )}
+            <div className="grid gap-2">
+              <Label htmlFor="email">メールアドレス</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="password">パスワード（8文字以上）</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+            {error && <p className="text-sm text-destructive">{error}</p>}
+            {notice && <p className="text-sm text-muted-foreground">{notice}</p>}
+            <Button type="submit" disabled={pending} className="w-full">
+              {mode === "signIn" ? "ログイン" : "登録する"}
+            </Button>
+          </form>
 
-      <form onSubmit={submit} style={{ display: "grid", gap: 8 }}>
-        {mode === "signUp" && (
-          <input
-            placeholder="名前"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            style={{ padding: 8 }}
-          />
-        )}
-        <input
-          type="email"
-          placeholder="メールアドレス"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{ padding: 8 }}
-        />
-        <input
-          type="password"
-          placeholder="パスワード（8文字以上）"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={{ padding: 8 }}
-        />
-        <button disabled={pending} style={{ padding: 8 }}>
-          {mode === "signIn" ? "ログイン" : "登録する"}
-        </button>
-      </form>
-
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
-      {notice && <p>{notice}</p>}
-
-      <button
-        onClick={() => setMode(mode === "signIn" ? "signUp" : "signIn")}
-        style={{
-          marginTop: 16,
-          background: "none",
-          border: "none",
-          color: "#2563eb",
-          cursor: "pointer",
-        }}
-      >
-        {mode === "signIn" ? "アカウントを作る" : "ログイン画面に戻る"}
-      </button>
+          <Button
+            variant="link"
+            className="mt-4 px-0"
+            onClick={() => setMode(mode === "signIn" ? "signUp" : "signIn")}
+          >
+            {mode === "signIn" ? "アカウントを作る" : "ログイン画面に戻る"}
+          </Button>
+        </CardContent>
+      </Card>
     </main>
   );
 }
@@ -121,55 +136,70 @@ function TodoList({
   }
 
   return (
-    <main
-      style={{ maxWidth: 480, margin: "2rem auto", padding: "0 16px", fontFamily: "sans-serif" }}
-    >
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1>Todo</h1>
+    <main className="mx-auto max-w-xl px-4 py-10">
+      <header className="mb-8 flex items-center justify-between">
         <div>
-          <span style={{ marginRight: 8 }}>{userName} さん</span>
+          <h1 className="text-2xl font-semibold tracking-tight">Todo</h1>
+          <p className="text-sm text-muted-foreground">{userName} さん</p>
+        </div>
+        <div className="flex items-center gap-2">
           {isAdmin && (
-            <a href="/admin" style={{ marginRight: 8 }}>
-              招待管理
-            </a>
+            <Button variant="outline" size="sm" asChild>
+              <a href="/admin">招待管理</a>
+            </Button>
           )}
-          <button onClick={signOut}>ログアウト</button>
+          <Button variant="ghost" size="sm" onClick={signOut}>
+            <LogOut />
+            ログアウト
+          </Button>
         </div>
       </header>
 
-      <Form form={form}>
-        <input
-          value={form.data.title}
-          onChange={(e) => form.setData("title", e.target.value)}
-          placeholder="やることを入力"
-          style={{ width: "70%", padding: 8 }}
-        />
-        <button disabled={form.pending} style={{ padding: 8, marginLeft: 8 }}>
-          追加
-        </button>
-        {form.errors.title && <p style={{ color: "crimson" }}>{form.errors.title}</p>}
-      </Form>
-
-      <ul style={{ listStyle: "none", padding: 0 }}>
-        {todos.map((t) => (
-          <li
-            key={t.id}
-            style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 0" }}
-          >
-            <input
-              type="checkbox"
-              checked={t.done}
-              onChange={() => action("/?toggle", { data: { id: t.id, done: !t.done } })}
+      <Card>
+        <CardContent className="p-6">
+          <Form form={form} className="flex gap-2">
+            <Input
+              value={form.data.title}
+              onChange={(e) => form.setData("title", e.target.value)}
+              placeholder="やることを入力"
             />
-            <span style={{ flex: 1, textDecoration: t.done ? "line-through" : "none" }}>
-              {t.title}
-            </span>
-            <button onClick={() => action("/?remove", { data: { id: t.id } })}>削除</button>
-          </li>
-        ))}
-      </ul>
+            <Button type="submit" disabled={form.pending}>
+              追加
+            </Button>
+          </Form>
+          {form.errors.title && (
+            <p className="mt-2 text-sm text-destructive">{form.errors.title}</p>
+          )}
 
-      {todos.length === 0 && <p>まだ何もありません</p>}
+          <ul className="mt-6 divide-y">
+            {todos.map((t) => (
+              <li key={t.id} className="flex items-center gap-3 py-3">
+                <input
+                  type="checkbox"
+                  className="size-4 accent-primary"
+                  checked={t.done}
+                  onChange={() => action("/?toggle", { data: { id: t.id, done: !t.done } })}
+                />
+                <span className={t.done ? "flex-1 text-muted-foreground line-through" : "flex-1"}>
+                  {t.title}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="削除"
+                  onClick={() => action("/?remove", { data: { id: t.id } })}
+                >
+                  <Trash2 />
+                </Button>
+              </li>
+            ))}
+          </ul>
+
+          {todos.length === 0 && (
+            <p className="mt-6 text-center text-sm text-muted-foreground">まだ何もありません</p>
+          )}
+        </CardContent>
+      </Card>
     </main>
   );
 }

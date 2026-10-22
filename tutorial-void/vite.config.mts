@@ -1,9 +1,10 @@
 import { defineConfig } from "vite-plus";
 import { voidPlugin } from "void";
 import { voidReact } from "@void/react/plugin";
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  plugins: [voidPlugin(), voidReact()],
+  plugins: [voidPlugin(), voidReact(), tailwindcss()],
 
   // lint（oxlint）: 生成ファイルは対象外
   lint: {
