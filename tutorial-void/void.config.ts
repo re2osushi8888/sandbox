@@ -5,4 +5,17 @@ export default defineConfig({
   worker: {
     compatibility_date: "2026-02-24",
   },
+  routing: {
+    // すべてのレスポンスに付けるセキュリティヘッダー
+    // CSP は React の開発サーバーやインラインスタイルを壊しやすいので、動作確認後に追加する
+    headers: {
+      "/*": [
+        "X-Frame-Options: DENY",
+        "X-Content-Type-Options: nosniff",
+        "Referrer-Policy: strict-origin-when-cross-origin",
+        "Strict-Transport-Security: max-age=31536000; includeSubDomains",
+        "Permissions-Policy: camera=(), microphone=(), geolocation=()",
+      ],
+    },
+  },
 });

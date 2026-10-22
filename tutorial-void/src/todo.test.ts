@@ -13,4 +13,12 @@ describe("todoTitleSchema", () => {
   it("空文字は拒否する", () => {
     expect(() => todoTitleSchema.parse("")).toThrow();
   });
+
+  it("200文字までは許可する", () => {
+    expect(todoTitleSchema.parse("a".repeat(200))).toBe("a".repeat(200));
+  });
+
+  it("201文字以上は拒否する", () => {
+    expect(() => todoTitleSchema.parse("a".repeat(201))).toThrow();
+  });
 });

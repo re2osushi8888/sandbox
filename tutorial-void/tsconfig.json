@@ -19,10 +19,22 @@
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "types": ["void/env"]
   },
-  "include": ["src", "pages", "routes", "middleware", "crons", "queues", "db"]
+  "include": [
+    "src",
+    "pages",
+    "routes",
+    "middleware",
+    "crons",
+    "queues",
+    "db",
+    "auth.ts",
+    "env.ts",
+    "void.config.ts"
+  ]
 }
