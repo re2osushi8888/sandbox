@@ -1,0 +1,20 @@
+[tools]
+python = "3.11.15"
+uv = "0.12.17"
+sops = "3.13.3"
+age = "1.3.2"
+
+[env]
+SOPS_AGE_KEY_FILE = "{{env.HOME}}/.config/sops/age/keys.txt"
+
+[tasks.cards]
+description = "inbox.txt を Anki に登録する（secrets.env を復号して渡す）"
+run = "sops exec-env secrets.env 'uv run add_cards.py'"
+
+[tasks.cards-regenerate]
+description = "全カードを AI で作り直す（cards.md の手直しは上書きされる。学習履歴は残る）"
+run = "sops exec-env secrets.env 'uv run add_cards.py --regenerate'"
+
+[tasks.secrets]
+description = "secrets.env を編集する"
+run = "sops secrets.env"

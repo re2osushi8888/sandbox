@@ -1,0 +1,10 @@
+[project]
+name = "anki-builder"
+version = "0.1.0"
+requires-python = "==3.11.15"
+dependencies = [
+    "anthropic==2.9.0",
+    "edge-tts==7.3.1",
+    "httpx==0.28.1",
+    "pydantic==2.14.3",
+]

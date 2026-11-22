@@ -1,0 +1,8 @@
+# 末尾に1行ずつ追加していく。「英語 | 説明」、説明は省略可（AIが書く）
+# # で始まる行はメモ。日付や先生の名前に使える
+
+# 2026-11-17 Teacher Anna
+procrastinate | 先延ばしにする。悪い意味で使う
+get used to ~ing | toの後は動名詞。be used to との違いに注意
+I'm looking forward to seeing you.
+make a reservation
