@@ -2,11 +2,12 @@
 
 <!-- add_cards.py が inbox.txt から作るファイル。手で直すと次の `mise run cards` で Anki に反映される。
      「## 」の後が見出し語（Anki で同じカードかどうかの判定に使うので変えない）。
-     同義語・反意語はカンマ区切り。画像検索を変えると画像を取り直す。
+     定義は産出カード（定義 → 英語を当てる）の問題文。同義語・反意語はカンマ区切り。画像検索を変えると画像を取り直す。
      先生のメモは inbox.txt から来る。直すなら inbox.txt 側を直す（そのカードは AI で作り直される）。 -->
 
 ## Noun
 - 説明: A noun is a word that names a person, place, thing, or idea.
+- 定義: A noun is a word that names a person, place, thing, or idea.
 - 例文: Dog is a noun.
 - 発音: /naʊn/
 - 意味: 名詞
@@ -16,6 +17,7 @@
 
 ## Pronoun
 - 説明: A word that replaces a noun, like he, she, or it.
+- 定義: A word that replaces a noun, like he, she, or it.
 - 例文: She is my best friend, and she lives nearby.
 - 発音: /ˈproʊnaʊn/
 - 意味: 代名詞
@@ -25,6 +27,7 @@
 
 ## Verb
 - 説明: A verb is a word that shows an action or a state.
+- 定義: A verb is a word that shows an action or a state.
 - 例文: She runs every morning.
 - 発音: /vɜːrb/
 - 意味: 動詞
@@ -34,6 +37,7 @@
 
 ## Adverb
 - 説明: A word that describes a verb, adjective, or other adverb.
+- 定義: A word that describes a verb, adjective, or other adverb.
 - 例文: She speaks English very quickly.
 - 発音: /ˈæd.vɝːb/
 - 意味: 副詞
@@ -43,6 +47,7 @@
 
 ## Adjective
 - 説明: A word that describes a noun, such as big or happy.
+- 定義: A word that describes a noun, such as big or happy.
 - 例文: She has a beautiful smile.
 - 発音: /ˈædʒɪktɪv/
 - 同義語: descriptive word
@@ -53,6 +58,7 @@
 
 ## Subject
 - 説明: The topic or main idea of a sentence, text, or class.
+- 定義: The topic or main idea of a sentence, text, or class.
 - 例文: Math is my favorite subject at school.
 - 発音: /ˈsʌbdʒɪkt/
 - 同義語: topic, theme
@@ -63,6 +69,7 @@
 
 ## Infinitive Verb
 - 説明: A verb form with 'to' plus the base verb, like 'to run'.
+- 定義: A verb form with 'to' plus the base verb, like 'to run'.
 - 例文: I want to learn English.
 - 発音: /ɪnˈfɪnɪtɪv vɜːrb/
 - 意味: 不定詞（動詞の原形に to をつけた形）
@@ -72,6 +79,7 @@
 
 ## Preposition
 - 説明: A preposition is a word that shows the relationship between nouns and other words.
+- 定義: A preposition is a word that shows the relationship between nouns and other words.
 - 例文: The book is on the table.
 - 発音: /ˌprepəˈzɪʃn/
 - 意味: 前置詞
@@ -81,6 +89,7 @@
 
 ## Conjunction
 - 説明: A word that connects words, phrases, or clauses together.
+- 定義: A word that connects words, phrases, or clauses together.
 - 例文: 'And' is a conjunction that joins two words in a sentence.
 - 発音: /kənˈdʒʌŋkʃən/
 - 意味: 接続詞
@@ -90,6 +99,7 @@
 
 ## Interjection
 - 説明: A word used to show sudden emotion, like surprise or pain.
+- 定義: A word used to show sudden emotion, like surprise or pain.
 - 例文: Oh! I forgot my keys again.
 - 発音: /ˌɪntərˈdʒekʃən/
 - 意味: 間投詞（感動詞）
@@ -99,6 +109,7 @@
 
 ## Linking Verb
 - 説明: A verb that connects the subject to a word describing it.
+- 定義: A verb that connects the subject to a word describing it.
 - 例文: The soup tastes delicious.
 - 発音: /ˈlɪŋkɪŋ vɜrb/
 - 同義語: copular verb
@@ -109,6 +120,7 @@
 
 ## Sentence
 - 説明: A group of words with a subject and a verb that expresses a complete meaning.
+- 定義: A group of words with a subject and verb that makes a complete idea.
 - 例文: She reads a book every night.
 - 発音: /ˈsentəns/
 - 反意語: fragment
@@ -120,6 +132,7 @@
 
 ## Paragraph
 - 説明: A group of sentences about one theme.
+- 定義: A group of sentences about one topic.
 - 例文: Each paragraph in the essay focuses on a different reason.
 - 発音: /ˈpærəɡræf/
 - 同義語: section
@@ -131,6 +144,7 @@
 
 ## Topic sentence
 - 説明: A sentence that shows the main topic of a paragraph. Usually at the beginning of the paragraph.
+- 定義: A sentence that shows the main idea of a paragraph.
 - 例文: The first sentence of the paragraph tells us what the writer will discuss.
 - 発音: /ˈtɑpɪk ˈsɛntəns/
 - 同義語: main idea sentence
@@ -142,6 +156,7 @@
 
 ## Article
 - 説明: Article: a, an, the. A word placed before a noun to show limitation or kind.
+- 定義: A small word placed before a noun, like a, an, or the.
 - 例文: She bought a new book yesterday.
 - 発音: /ˈɑːr.tɪ.kl̩/
 - 意味: 冠詞（a / an / the など、名詞の前に置く語）
@@ -152,6 +167,7 @@
 
 ## Determiner
 - 説明: A determiner limits the meaning of a noun. Examples: a, the, this, some.
+- 定義: A word placed before a noun to show which one or how many.
 - 例文: I bought a new bag, but this bag is too small.
 - 発音: /dɪˈtɜːrmɪnər/
 - 意味: 限定詞（名詞の前で意味を限定する語）
@@ -162,6 +178,7 @@
 
 ## Auxiliary verb
 - 説明: Auxiliary verbs: do, have, be. They help other verbs make questions and tenses.
+- 定義: A verb that helps another verb form questions or tenses.
 - 例文: Do you like coffee?
 - 発音: /ɔːɡˈzɪliəri vɝːb/
 - 意味: 助動詞（他の動詞を助けて疑問文や時制などを作る動詞）
@@ -172,6 +189,7 @@
 
 ## Modal verb
 - 説明: Modal verbs include can, should, and will. They show ability, obligation, or possibility.
+- 定義: A modal verb helps show ability, obligation, or possibility.
 - 例文: You should wear a helmet when you ride a bike.
 - 発音: /ˈmoʊdl ˈvɜːrb/
 - 意味: 法助動詞（can・should・will など）。可能・義務・推量などを表す助動詞
@@ -182,6 +200,7 @@
 
 ## Gerund
 - 説明: A gerund is the -ing form of a verb that functions as a noun.
+- 定義: A gerund is a verb form ending in -ing that works as a noun.
 - 例文: Swimming is my favorite exercise.
 - 発音: /ˈdʒɛrənd/
 - 意味: 動名詞
@@ -192,6 +211,7 @@
 
 ## Participle
 - 説明: A participle is a form of a verb, such as the -ing form or past participle, used to make adjectives, progressive tenses, and perfect tenses.
+- 定義: A verb form, like -ing or past participle, used as an adjective or in tenses.
 - 例文: The crying baby needed a hug.
 - 発音: /ˈpɑːrtɪsɪpəl/
 - 意味: 分詞
@@ -202,6 +222,7 @@
 
 ## Relative pronoun
 - 説明: Relative pronouns such as who, which, and that introduce a clause that describes a noun placed before it.
+- 定義: A word that connects a noun to a clause that describes it.
 - 例文: The woman who lives next door is a doctor.
 - 発音: /ˈrelətɪv ˈproʊnaʊn/
 - 意味: 関係代名詞（名詞を後ろから説明する節を導く語）
@@ -212,6 +233,7 @@
 
 ## Possessive
 - 説明: Possessive forms like my, mine, and his show ownership.
+- 定義: A word form that shows who owns something.
 - 例文: That bag is mine, not yours.
 - 発音: /pəˈzesɪv/
 - 意味: 所有格・所有代名詞（所有関係を表す語）
@@ -222,6 +244,7 @@
 
 ## Demonstrative
 - 説明: Demonstratives: this, that, these, those. They point to the target.
+- 定義: A word that points to a specific thing or person.
 - 例文: This book is mine, and that one is yours.
 - 発音: /dɪˈmɑːnstrətɪv/
 - 意味: 指示詞（this / that / these / those など、対象を指し示す語）
@@ -232,6 +255,7 @@
 
 ## Quantifier
 - 説明: Quantifiers such as some, many, few, and all express numbers or amounts.
+- 定義: A word that shows how many or how much of something.
 - 例文: Some students finished the test early.
 - 発音: /ˈkwɑːntɪfaɪər/
 - 意味: 数量詞（数や量を表す語）
@@ -242,6 +266,7 @@
 
 ## Phrase
 - 説明: A group of two or more words without a subject and verb.
+- 定義: A group of two or more words without a subject and verb.
 - 例文: A phrase like "a red apple" has no subject or verb.
 - 発音: /ˈfreɪz/
 - 反意語: sentence
@@ -253,6 +278,7 @@
 
 ## Clause
 - 説明: A group of words that includes a subject and a verb.
+- 定義: A group of words with a subject and a verb.
 - 例文: The second clause of this sentence explains the reason.
 - 発音: /klɔːz/
 - 意味: 節（主語と動詞を含む語のまとまり）
@@ -263,6 +289,7 @@
 
 ## Object
 - 説明: Object: the word or phrase that is the target of the verb's action.
+- 定義: A noun that receives the action of a verb.
 - 例文: She kicked the ball across the field.
 - 発音: /ˈɑbdʒɪkt/
 - 反意語: subject
@@ -274,6 +301,7 @@
 
 ## Complement
 - 説明: A complement explains the meaning of the subject or object.
+- 定義: A word or phrase that describes or completes the subject or object.
 - 例文: The word 'happy' is a complement in 'She is happy.'
 - 発音: /ˈkɑːmplɪmənt/
 - 意味: 補語（主語や目的語の意味を補って説明する語句）
@@ -284,6 +312,7 @@
 
 ## Predicate
 - 説明: The part that describes the subject: a verb and what follows it.
+- 定義: The part of a sentence that says what the subject does or is.
 - 例文: In 'She runs fast,' the predicate is 'runs fast.'
 - 発音: /ˈprɛdɪkət/
 - 反意語: subject
@@ -295,6 +324,7 @@
 
 ## Transitive verb
 - 説明: A verb that needs an object.
+- 定義: A verb that needs an object to complete its meaning.
 - 例文: She opened the door.
 - 発音: /ˈtrænzɪtɪv vɜːrb/
 - 反意語: intransitive verb
@@ -306,6 +336,7 @@
 
 ## Intransitive verb
 - 説明: A verb that does not need an object.
+- 定義: A verb that does not need an object.
 - 例文: The baby is sleeping.
 - 発音: /ɪnˈtrænsɪtɪv vɜːrb/
 - 反意語: transitive verb
@@ -317,6 +348,7 @@
 
 ## Antecedent
 - 説明: A noun before a relative pronoun that it refers to.
+- 定義: A word that a pronoun or relative pronoun refers back to.
 - 例文: In "The man who lives next door is kind," the antecedent of "who" is "the man."
 - 発音: /ˈæntɪsiːdənt/
 - 意味: 先行詞
@@ -327,6 +359,7 @@
 
 ## Tense
 - 説明: Tense is the verb form that shows when an action or state happens.
+- 定義: Tense shows when an action or state happens: past, present, or future.
 - 例文: She studied English yesterday, so the verb is in the past tense.
 - 発音: /tens/
 - 意味: 時制
@@ -337,6 +370,7 @@
 
 ## Present perfect
 - 説明: Present perfect: have/has + past participle, used for experience, completion, and continuation from past to present.
+- 定義: A verb form made with have or has plus a past participle.
 - 例文: I have visited Manila twice.
 - 発音: /ˌprez.ənt ˈpɜːr.fɪkt/
 - 反意語: simple past
@@ -348,6 +382,7 @@
 
 ## Passive voice
 - 説明: Passive voice: the subject receives the action. Form: be + past participle.
+- 定義: A grammar form where the subject receives the action.
 - 例文: The letter was written by my teacher.
 - 発音: /ˈpæsɪv vɔɪs/
 - 反意語: active voice
@@ -359,6 +394,7 @@
 
 ## Conditional
 - 説明: A sentence form meaning "if ~, then …".
+- 定義: A conditional is a sentence that talks about 'if' and its result.
 - 例文: If it rains tomorrow, we will stay home.
 - 発音: /kənˈdɪʃənl/
 - 意味: 条件文（もし〜なら…を表す文の形）
@@ -369,6 +405,7 @@
 
 ## Subjunctive
 - 説明: Subjunctive is a verb form used for things that are not true or for wishes.
+- 定義: A verb form used for wishes, doubts, or things that are not real.
 - 例文: If I were rich, I would travel around the world.
 - 発音: /səbˈdʒʌŋktɪv/
 - 反意語: indicative
@@ -380,6 +417,7 @@
 
 ## Countable noun
 - 説明: Countable noun: a noun you can count (a book, two books).
+- 定義: A noun that you can count, like one book or two books.
 - 例文: She bought three apples at the market.
 - 発音: /ˈkaʊntəbl noʊn/
 - 反意語: uncountable noun
@@ -391,6 +429,7 @@
 
 ## Uncountable noun
 - 説明: Nouns that cannot be counted, such as water and information.
+- 定義: A noun that cannot be counted, like water or information.
 - 例文: Water is essential for life.
 - 発音: /ʌnˈkaʊntəbl ˈnaʊn/
 - 反意語: countable noun
@@ -402,6 +441,7 @@
 
 ## Comparative
 - 説明: Comparative form for comparing two things, such as bigger or more beautiful.
+- 定義: A form used to compare two things, like bigger or more beautiful.
 - 例文: My new phone is faster than my old one.
 - 発音: /kəmˈpærətɪv/
 - 反意語: superlative
@@ -413,6 +453,7 @@
 
 ## Superlative
 - 説明: Superlative: the form that shows something is the most among three or more things (biggest, most beautiful).
+- 定義: The form used to say something is the most among three or more things.
 - 例文: She is the tallest student in our class.
 - 発音: /suːˈpɜːrlətɪv/
 - 反意語: comparative
@@ -424,6 +465,7 @@
 
 ## Phrasal verb
 - 説明: A phrasal verb is a verb plus an adverb or preposition, like give up, that has a different meaning.
+- 定義: A verb combined with a particle that creates a new meaning.
 - 例文: She decided to give up smoking last year.
 - 発音: /ˈfreɪzəl vɜrb/
 - 意味: 句動詞（動詞と副詞・前置詞の組み合わせで別の意味を表すもの）
@@ -434,6 +476,7 @@
 
 ## Idiom
 - 説明: An idiom is a fixed expression. Its meaning cannot be understood from the meanings of its individual words.
+- 定義: An idiom is a fixed phrase whose meaning is not clear from its words.
 - 例文: "Break a leg!" is an idiom that means "good luck."
 - 発音: /ˈɪdiəm/
 - 同義語: set phrase, expression

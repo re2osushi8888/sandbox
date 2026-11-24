@@ -11,6 +11,11 @@ inbox.txt の書式（1行1エントリ）:
     綴りを直した行は、Anki の古いカードを引き継ぐ（学習履歴は残し、音声・画像は作り直す）
     # で始まる行と空行は無視
 
+カードは2種類:
+    Card 1（認識）: 英語 → 意味
+    Card 2（産出）: 英語の定義 → 英語を当てる。単語・短いフレーズだけに作る。
+    同じ日に両方が出ないよう、デッキに「兄弟カードを延期」を設定したプリセットを使う
+
 流れ: inbox.txt → (AI) → cards.md → Anki
     - AI を呼ぶのは cards.md にまだない行と、inbox.txt で先生の説明を書き換えた行だけ
     - cards.md を手で直すと、次の実行で Anki に反映される（学習履歴は残る）
@@ -21,6 +26,7 @@ import argparse
 import asyncio
 import base64
 import difflib
+import functools
 import hashlib
 import html
 import os
@@ -45,7 +51,10 @@ TTS_VOICE = os.environ.get("TTS_VOICE", "en-US-AriaNeural")
 PIXABAY_API_KEY = os.environ.get("PIXABAY_API_KEY", "")
 DECKS_DIR = Path(os.environ.get("DECKS_DIR", str(HERE / "decks")))
 
-FIELDS = ["Text", "Explanation", "IPA", "Example", "Audio", "Image", "Source", "Japanese", "Related"]
+DECK_PRESET = os.environ.get("ANKI_DECK_PRESET", "English")  # 兄弟カードを延期するプリセット
+PRODUCTION_MAX_WORDS = 4  # これより長い文には産出カードを作らない
+
+FIELDS = ["Text", "Explanation", "IPA", "Example", "Audio", "Image", "Source", "Japanese", "Related", "Reverse"]
 
 CSS = """
 .card { font-family: -apple-system, "Hiragino Sans", sans-serif; font-size: 22px;
@@ -59,6 +68,7 @@ CSS = """
 .japanese { text-align: left; margin: 12px auto; max-width: 560px; font-size: 16px; }
 .source { font-size: 12px; color: #999; }
 img { max-width: 100%; max-height: 260px; border-radius: 8px; }
+.hint { font-family: Menlo, monospace; font-size: 26px; letter-spacing: 4px; margin: 16px 0; }
 """
 
 FRONT = """<div class="text">{{Text}}</div>
@@ -74,7 +84,25 @@ BACK = """{{FrontSide}}
 {{#Japanese}}<div class="japanese">{{hint:Japanese}}</div>{{/Japanese}}
 <div class="source">{{Source}}</div>"""
 
-JAPANESE_CHARS = re.compile(r"[぀-ヿ一-鿿]")
+# 産出カード: 説明（答えは伏せる）＋最初の1文字と文字数のヒント → 英語
+# Reverse が空のノートには Card 2 を作らないよう、表面全体を {{#Reverse}} で囲む
+FRONT2 = """{{#Reverse}}<div>{{Image}}</div>
+{{Reverse}}{{/Reverse}}"""
+
+BACK2 = """{{FrontSide}}
+<hr id="answer">
+<div class="text">{{Text}}</div>
+{{Audio}}
+<div class="ipa">{{IPA}}</div>
+<div class="example">{{Example}}</div>
+{{#Japanese}}<div class="japanese">{{hint:Japanese}}</div>{{/Japanese}}"""
+
+TEMPLATES = {
+    "Card 1": {"Front": FRONT, "Back": BACK},
+    "Card 2": {"Front": FRONT2, "Back": BACK2},
+}
+
+JAPANESE_CHARS = re.compile(r"[\u3040-\u30ff\u4e00-\u9fff]")
 
 
 def has_japanese(text: str) -> bool:
@@ -92,6 +120,7 @@ class Card:
     """cards.md の1カード。label は cards.md に書く見出し。"""
     text: str
     explanation: str = field(default="", metadata={"label": "説明"})
+    definition: str = field(default="", metadata={"label": "定義"})  # 産出カード用。常に AI の短い定義
     example: str = field(default="", metadata={"label": "例文"})
     ipa: str = field(default="", metadata={"label": "発音"})
     synonyms: str = field(default="", metadata={"label": "同義語"})
@@ -139,11 +168,20 @@ def parse_inbox(path: Path) -> list[Entry]:
     return entries
 
 
+def fix_inbox_text(path: Path, old: str, new: str) -> None:
+    """inbox.txt の見出し語 old を new に書き換える（説明部分はそのまま）。"""
+    lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+    for i, raw in enumerate(lines):
+        if not raw.strip().startswith("#") and raw.replace("｜", "|").partition("|")[0].strip() == old:
+            lines[i] = raw.replace(old, new, 1)
+    path.write_text("".join(lines), encoding="utf-8")
+
+
 CARDS_HEADER = """# Cards
 
 <!-- add_cards.py が inbox.txt から作るファイル。手で直すと次の `mise run cards` で Anki に反映される。
      「## 」の後が見出し語（Anki で同じカードかどうかの判定に使うので変えない）。
-     同義語・反意語はカンマ区切り。画像検索を変えると画像を取り直す。
+     定義は産出カード（定義 → 英語を当てる）の問題文。同義語・反意語はカンマ区切り。画像検索を変えると画像を取り直す。
      先生のメモは inbox.txt から来る。直すなら inbox.txt 側を直す（そのカードは AI で作り直される）。 -->
 """
 
@@ -164,15 +202,6 @@ def load_cards(path: Path) -> dict[str, Card]:
     return cards
 
 
-def fix_inbox_text(path: Path, old: str, new: str) -> None:
-    """inbox.txt の見出し語 old を new に書き換える（説明部分はそのまま）。"""
-    lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
-    for i, raw in enumerate(lines):
-        if not raw.strip().startswith("#") and raw.replace("｜", "|").partition("|")[0].strip() == old:
-            lines[i] = raw.replace(old, new, 1)
-    path.write_text("".join(lines), encoding="utf-8")
-
-
 def save_cards(path: Path, cards: dict[str, Card]) -> None:
     out = [CARDS_HEADER]
     for card in cards.values():
@@ -190,9 +219,14 @@ def split_list(value: str) -> list[str]:
 
 # ---------- AI ----------
 
-def ask_claude(client: anthropic.Anthropic, entry: Entry) -> CardInfo:
+@functools.cache
+def claude() -> anthropic.Anthropic:
+    return anthropic.Anthropic()
+
+
+def ask_claude(entry: Entry) -> CardInfo:
     teacher = f"\n先生の説明: {entry.explanation}" if entry.explanation else ""
-    response = client.messages.parse(
+    response = claude().messages.parse(
         model=CLAUDE_MODEL,
         max_tokens=2000,
         output_config={"effort": "low"},
@@ -212,8 +246,8 @@ def ask_claude(client: anthropic.Anthropic, entry: Entry) -> CardInfo:
     return response.parsed_output
 
 
-def generate_card(client: anthropic.Anthropic, entry: Entry) -> Card:
-    info = ask_claude(client, entry)
+def generate_card(entry: Entry) -> Card:
+    info = ask_claude(entry)
     if not entry.explanation:
         explanation, source = info.explanation, "AI"
     elif has_japanese(entry.explanation):
@@ -223,6 +257,7 @@ def generate_card(client: anthropic.Anthropic, entry: Entry) -> Card:
     return Card(
         text=info.corrected_text.strip() or entry.text,
         explanation=explanation,
+        definition=info.explanation,
         example=info.example_en,
         ipa=info.ipa,
         synonyms=", ".join(info.synonyms[:2]),
@@ -261,7 +296,11 @@ def ensure_note_type() -> None:
         for name in FIELDS:
             if name not in existing:
                 anki("modelFieldAdd", modelName=NOTE_TYPE, fieldName=name)
-        anki("updateModelTemplates", model={"name": NOTE_TYPE, "templates": {"Card 1": {"Front": FRONT, "Back": BACK}}})
+        existing_templates = anki("modelTemplates", modelName=NOTE_TYPE)
+        for name, tmpl in TEMPLATES.items():
+            if name not in existing_templates:
+                anki("modelTemplateAdd", modelName=NOTE_TYPE, template={"Name": name, **tmpl})
+        anki("updateModelTemplates", model={"name": NOTE_TYPE, "templates": TEMPLATES})
         anki("updateModelStyling", model={"name": NOTE_TYPE, "css": CSS})
         return
     anki(
@@ -269,7 +308,7 @@ def ensure_note_type() -> None:
         modelName=NOTE_TYPE,
         inOrderFields=FIELDS,
         css=CSS,
-        cardTemplates=[{"Name": "Card 1", "Front": FRONT, "Back": BACK}],
+        cardTemplates=[{"Name": name, **tmpl} for name, tmpl in TEMPLATES.items()],
     )
     print(f"ノートタイプ「{NOTE_TYPE}」を作成しました")
 
@@ -351,6 +390,34 @@ def format_japanese(card: Card) -> str:
     return "<br>".join(lines)
 
 
+def wants_production(text: str) -> bool:
+    return len(text.split()) <= PRODUCTION_MAX_WORDS and not text.rstrip().endswith((".", "?", "!"))
+
+
+def mask_answer(explanation: str, text: str) -> str:
+    """説明の中の答え（とその活用形）を ____ に置き換える。"""
+    core = re.sub(r"\s*~\S*", "", text).strip()  # get used to ~ing → get used to
+    words = [w for w in re.findall(r"[A-Za-z]+", text) if len(w) >= 4] + [text, core]
+    for w in sorted(set(words), key=len, reverse=True):
+        explanation = re.sub(rf"\b{re.escape(w)}\w*", "____", explanation, flags=re.IGNORECASE)
+    return explanation
+
+
+def letter_hint(text: str) -> str:
+    """procrastinate → p____________ (13)。空白や記号はそのまま見せる。"""
+    pattern = text[0] + "".join("_" if c.isalpha() else c for c in text[1:])
+    letters = sum(c.isalpha() for c in text)
+    return f"{html.escape(pattern)} <small>({letters})</small>"
+
+
+def format_reverse(card: Card) -> str:
+    """産出カードの表。空ならそのノートに Card 2 は作られない。"""
+    if not card.definition or not wants_production(card.text):
+        return ""
+    return (f'<div class="explanation">{html.escape(mask_answer(card.definition, card.text))}</div>'
+            f'<div class="hint">{letter_hint(card.text)}</div>')
+
+
 def anki_fields(card: Card, existing: dict | None) -> dict[str, str]:
     key = hashlib.sha1(card.text.encode()).hexdigest()[:12]
     old = existing["fields"] if existing else {}
@@ -370,6 +437,7 @@ def anki_fields(card: Card, existing: dict | None) -> dict[str, str]:
         "Source": f"説明: {card.source}" if card.source else "",
         "Japanese": format_japanese(card),
         "Related": format_related(card),
+        "Reverse": format_reverse(card),
     }
 
 
@@ -400,6 +468,31 @@ def find_renamed(text: str, orphans: dict[str, dict]) -> str | None:
     return by_lower[match[0]] if match else None
 
 
+def suspend_empty_production_cards() -> None:
+    """対象外（Reverse が空）の Card 2 は停止する。Anki の「ツール → 空のカード」で削除できる。"""
+    if empty := anki("findCards", query=f'"note:{NOTE_TYPE}" card:2 Reverse: -is:suspended'):
+        anki("suspend", cards=empty)
+
+
+def ensure_deck(deck: str) -> None:
+    """デッキを作り、兄弟カードを延期するプリセットを割り当てる（他のデッキのプリセットは変えない）。"""
+    anki("createDeck", deck=deck)
+    config = anki("getDeckConfig", deck=deck)
+    if config["name"] == DECK_PRESET:
+        return
+    preset_id = next(
+        (c["id"] for d in anki("deckNames") if (c := anki("getDeckConfig", deck=d))["name"] == DECK_PRESET),
+        None,
+    )
+    if preset_id is None:
+        preset_id = anki("cloneDeckConfigId", name=DECK_PRESET, cloneFrom=config["id"])
+        preset = anki("getDeckConfig", deck=deck) | {"id": preset_id, "name": DECK_PRESET}
+        preset["new"]["bury"] = preset["rev"]["bury"] = True
+        anki("saveDeckConfig", config=preset)
+        print(f"プリセット「{DECK_PRESET}」を作成（兄弟カードを延期）")
+    anki("setDeckConfigId", decks=[deck], configId=preset_id)
+
+
 def with_retry(fn, attempts: int = 3):
     """通信エラーなど一時的な失敗はやり直す。"""
     for i in range(attempts):
@@ -411,7 +504,7 @@ def with_retry(fn, attempts: int = 3):
             time.sleep(2 * (i + 1))
 
 
-def generate_missing(deck_dir: Path, regenerate: bool, client_factory) -> tuple[dict[str, Card], int]:
+def generate_missing(deck_dir: Path, regenerate: bool) -> tuple[dict[str, Card], int]:
     """inbox.txt のうち cards.md にない行を AI で作り、cards.md に保存する。"""
     cards_path = deck_dir / "cards.md"
     entries = parse_inbox(deck_dir / "inbox.txt")
@@ -422,10 +515,24 @@ def generate_missing(deck_dir: Path, regenerate: bool, client_factory) -> tuple[
         e for e in entries
         if regenerate or e.text not in cards or e.explanation != cards[e.text].memo
     ]
+    generating = {e.text for e in to_generate}
     failed = 0
+    # 定義がないカード（定義の項目を足す前に作ったもの）は、手直しを残したまま定義だけ AI で埋める
+    for card in cards.values():
+        if card.definition or card.text in generating:
+            continue
+        if card.source == "AI":
+            card.definition = card.explanation
+            continue
+        try:
+            card.definition = with_retry(lambda: ask_claude(Entry(card.text, card.memo))).explanation
+            print(f"  📖 定義を追加: {card.text}")
+        except Exception as e:
+            failed += 1
+            print(f"  ❌ 定義の追加に失敗 {card.text}: {e}", file=sys.stderr)
     for i, entry in enumerate(to_generate, 1):
         try:
-            card = with_retry(lambda: generate_card(client_factory(), entry))
+            card = with_retry(lambda: generate_card(entry))
             if card.text != entry.text:
                 fix_inbox_text(deck_dir / "inbox.txt", entry.text, card.text)
                 cards.pop(entry.text, None)
@@ -462,13 +569,6 @@ def main() -> int:
     if not PIXABAY_API_KEY:
         print("（PIXABAY_API_KEY が未設定なので画像はスキップします）")
 
-    client: anthropic.Anthropic | None = None
-
-    def client_factory() -> anthropic.Anthropic:
-        nonlocal client
-        client = client or anthropic.Anthropic()
-        return client
-
     ensure_note_type()
     notes = existing_notes()
     failed = added = updated = 0
@@ -476,7 +576,7 @@ def main() -> int:
     generated: list[tuple[Path, dict[str, Card]]] = []
     for deck_dir in deck_dirs:
         print(f"■ {deck_name(deck_dir)}  (decks/{deck_dir.name})")
-        cards, gen_failed = generate_missing(deck_dir, args.regenerate, client_factory)
+        cards, gen_failed = generate_missing(deck_dir, args.regenerate)
         failed += gen_failed
         generated.append((deck_dir, cards))
 
@@ -487,7 +587,7 @@ def main() -> int:
     for deck_dir, cards in generated:
         deck = deck_name(deck_dir)
         print(f"■ {deck} → Anki")
-        anki("createDeck", deck=deck)
+        ensure_deck(deck)
         for card in cards.values():
             existing = notes.get(card.text)
             if existing is None and (old := find_renamed(card.text, orphans)):
@@ -506,6 +606,8 @@ def main() -> int:
                 added += "✅" in mark
                 updated += "✅" not in mark
         print(f"  cards.md: {len(cards)} 件")
+
+    suspend_empty_production_cards()
 
     if orphans:
         print(f"⚠️  Anki にだけあるカード（どの inbox.txt にもない）: {', '.join(orphans)}")

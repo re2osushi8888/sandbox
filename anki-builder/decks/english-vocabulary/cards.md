@@ -2,11 +2,12 @@
 
 <!-- add_cards.py が inbox.txt から作るファイル。手で直すと次の `mise run cards` で Anki に反映される。
      「## 」の後が見出し語（Anki で同じカードかどうかの判定に使うので変えない）。
-     同義語・反意語はカンマ区切り。画像検索を変えると画像を取り直す。
+     定義は産出カード（定義 → 英語を当てる）の問題文。同義語・反意語はカンマ区切り。画像検索を変えると画像を取り直す。
      先生のメモは inbox.txt から来る。直すなら inbox.txt 側を直す（そのカードは AI で作り直される）。 -->
 
 ## procrastinate
 - 説明: Use it in a negative sense.
+- 定義: To delay doing something you should do, often without a good reason.
 - 例文: I always procrastinate when I have to write a report.
 - 発音: /proʊˈkræstɪneɪt/
 - 同義語: delay, postpone
@@ -19,6 +20,7 @@
 
 ## I'm looking forward to seeing you.
 - 説明: You use this phrase to say you are happy about a future meeting.
+- 定義: You use this phrase to say you are happy about a future meeting.
 - 例文: We are looking forward to hearing from you soon.
 - 発音: /aɪm ˈlʊkɪŋ ˈfɔːrwərd tuː ˈsiːɪŋ juː/
 - 同義語: I can't wait to see you
@@ -29,6 +31,7 @@
 
 ## make a reservation
 - 説明: To ask for a seat, room, or table before you go.
+- 定義: To ask for a seat, room, or table before you go.
 - 例文: I'd like to make a reservation for two at seven o'clock.
 - 発音: /meɪk ə ˌrezərˈveɪʃn/
 - 同義語: book, reserve
@@ -40,6 +43,7 @@
 
 ## absent
 - 説明: Not present in a place where you are expected to be.
+- 定義: Not present in a place where you are expected to be.
 - 例文: She was absent from school because she had a fever.
 - 発音: /ˈæbsənt/
 - 同義語: missing, away
@@ -51,6 +55,7 @@
 
 ## get used to ~ing
 - 説明: To become comfortable with something that was new or strange before.
+- 定義: To become comfortable with something that was new or strange before.
 - 例文: I finally got used to waking up early for school.
 - 発音: /ɡɛt juːzd tuː ˈɪŋ/
 - 同義語: be accustomed to ~ing, adapt to ~ing
