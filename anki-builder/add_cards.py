@@ -1,9 +1,14 @@
-"""inbox.txt に書いた単語・文章からカードを作り、cards.md に保存して Anki に反映する。
+"""decks/<名前>/inbox.txt に書いた単語・文章からカードを作り、cards.md に保存して Anki に反映する。
+
+decks/ の下のディレクトリが1つのデッキになる（例: decks/english-grammar → English Grammar）。
+ディレクトリを作って inbox.txt を置けばデッキが増える。
 
 inbox.txt の書式（1行1エントリ）:
     単語や文章 | 先生の説明
     単語や文章              ← 説明なしなら AI が英語で短い説明を書く
     先生の説明が日本語なら、AI が短い英語に直す（元の日本語はメモとして残す）
+    英語のスペルミスは AI が直し、inbox.txt も書き換える（git の差分で確認・取り消しできる）
+    綴りを直した行は、Anki の古いカードを引き継ぐ（学習履歴は残し、音声・画像は作り直す）
     # で始まる行と空行は無視
 
 流れ: inbox.txt → (AI) → cards.md → Anki
@@ -15,6 +20,7 @@ inbox.txt の書式（1行1エントリ）:
 import argparse
 import asyncio
 import base64
+import difflib
 import hashlib
 import html
 import os
@@ -32,13 +38,12 @@ from pydantic import BaseModel, Field
 HERE = Path(__file__).parent
 
 ANKI_CONNECT_URL = os.environ.get("ANKI_CONNECT_URL", "http://127.0.0.1:8765")
-DECK = os.environ.get("ANKI_DECK", "Cebu English")
+ROOT_DECK = os.environ.get("ANKI_DECK", "")  # 親デッキ。空ならトップレベルに作る
 NOTE_TYPE = os.environ.get("ANKI_NOTE_TYPE", "Cebu English")
 CLAUDE_MODEL = os.environ.get("CLAUDE_MODEL", "claude-haiku-5-5")
 TTS_VOICE = os.environ.get("TTS_VOICE", "en-US-AriaNeural")
 PIXABAY_API_KEY = os.environ.get("PIXABAY_API_KEY", "")
-DEFAULT_INBOX = os.environ.get("INBOX_PATH", str(HERE / "inbox.txt"))
-DEFAULT_CARDS = os.environ.get("CARDS_PATH", str(HERE / "cards.md"))
+DECKS_DIR = Path(os.environ.get("DECKS_DIR", str(HERE / "decks")))
 
 FIELDS = ["Text", "Explanation", "IPA", "Example", "Audio", "Image", "Source", "Japanese", "Related"]
 
@@ -102,6 +107,10 @@ CARD_LABELS = {f.metadata["label"]: f.name for f in dataclass_fields(Card) if "l
 
 
 class CardInfo(BaseModel):
+    corrected_text: str = Field(description=(
+        "入力の英語のスペルミスだけを直したもの。ミスがなければ入力をそのまま返す。"
+        "文法・言い回し・大文字小文字・句読点・~ などの記号は変えない"
+    ))
     explanation: str = Field(description="One short sentence in simple English (max 15 words)")
     ipa: str = Field(description="IPA 発音記号（米国英語）。スラッシュで囲む")
     example_en: str = Field(description="自然な英語の例文1つ。入力が文章なら似た場面で使える別の文")
@@ -155,6 +164,15 @@ def load_cards(path: Path) -> dict[str, Card]:
     return cards
 
 
+def fix_inbox_text(path: Path, old: str, new: str) -> None:
+    """inbox.txt の見出し語 old を new に書き換える（説明部分はそのまま）。"""
+    lines = path.read_text(encoding="utf-8").splitlines(keepends=True)
+    for i, raw in enumerate(lines):
+        if not raw.strip().startswith("#") and raw.replace("｜", "|").partition("|")[0].strip() == old:
+            lines[i] = raw.replace(old, new, 1)
+    path.write_text("".join(lines), encoding="utf-8")
+
+
 def save_cards(path: Path, cards: dict[str, Card]) -> None:
     out = [CARDS_HEADER]
     for card in cards.values():
@@ -184,6 +202,7 @@ def ask_claude(client: anthropic.Anthropic, entry: Entry) -> CardInfo:
             "先生の説明があればそれと矛盾しない内容にしてください。"
             "学習者は英語を英語のまま理解したいので、日本語訳は補助としてだけ使います。"
             "explanation は英語で、1文・15語以内の、初心者にもすぐ分かる平易な英語にしてください。"
+            "入力は授業中のメモなのでスペルミスがありえます。corrected_text 以外の項目は、直したあとの英語について作ってください。"
         ),
         messages=[{"role": "user", "content": f"英語: {entry.text}{teacher}"}],
         output_format=CardInfo,
@@ -202,7 +221,7 @@ def generate_card(client: anthropic.Anthropic, entry: Entry) -> Card:
     else:
         explanation, source = entry.explanation, "先生"
     return Card(
-        text=entry.text,
+        text=info.corrected_text.strip() or entry.text,
         explanation=explanation,
         example=info.example_en,
         ipa=info.ipa,
@@ -229,8 +248,13 @@ def anki(action: str, **params):
     return res["result"]
 
 
-def ensure_deck_and_note_type() -> None:
-    anki("createDeck", deck=DECK)
+def deck_name(deck_dir: Path) -> str:
+    # english-grammar → English Grammar
+    name = " ".join(w.capitalize() for w in deck_dir.name.split("-"))
+    return f"{ROOT_DECK}::{name}" if ROOT_DECK else name
+
+
+def ensure_note_type() -> None:
     if NOTE_TYPE in anki("modelNames"):
         # 既存のノートタイプにもフィールド・テンプレート・CSSの変更を反映する
         existing = anki("modelFieldNames", modelName=NOTE_TYPE)
@@ -251,15 +275,19 @@ def ensure_deck_and_note_type() -> None:
 
 
 def existing_notes() -> dict[str, dict]:
-    """デッキ内のノートを Text → {id, fields, tags} で返す。"""
-    ids = anki("findNotes", query=f'"deck:{DECK}"')
+    """このノートタイプのノートを Text → {id, fields, tags, cards, decks} で返す。"""
+    notes = anki("notesInfo", notes=anki("findNotes", query=f'"note:{NOTE_TYPE}"'))
+    card_ids = [c for n in notes for c in n["cards"]]
+    deck_of = {c["cardId"]: c["deckName"] for c in anki("cardsInfo", cards=card_ids)}
     return {
         n["fields"]["Text"]["value"]: {
             "id": n["noteId"],
             "fields": {k: v["value"] for k, v in n["fields"].items()},
             "tags": n["tags"],
+            "cards": n["cards"],
+            "decks": {deck_of[c] for c in n["cards"]},
         }
-        for n in anki("notesInfo", notes=ids)
+        for n in notes
     }
 
 
@@ -345,20 +373,31 @@ def anki_fields(card: Card, existing: dict | None) -> dict[str, str]:
     }
 
 
-def sync_card(card: Card, existing: dict | None) -> str:
-    """Anki にカードを追加・更新する。戻り値は表示用の記号。"""
+def sync_card(card: Card, existing: dict | None, deck: str) -> str:
+    """Anki にカードを追加・更新・移動する。戻り値は表示用の記号。"""
     fields = anki_fields(card, existing)
     tags = ["ai-explained"] if card.source == "AI" else ["teacher"]
     if existing is None:
         anki("addNote", note={
-            "deckName": DECK, "modelName": NOTE_TYPE, "fields": fields, "tags": tags,
+            "deckName": deck, "modelName": NOTE_TYPE, "fields": fields, "tags": tags,
             "options": {"allowDuplicate": False, "duplicateScope": "deck"},
         })
         return "✅"
-    if fields == {k: existing["fields"].get(k, "") for k in fields} and set(tags) <= set(existing["tags"]):
-        return ""
-    anki("updateNote", note={"id": existing["id"], "fields": fields, "tags": tags})
-    return "🔄"
+    mark = ""
+    if existing["decks"] != {deck}:
+        anki("changeDeck", cards=existing["cards"], deck=deck)
+        mark += "📦"
+    if fields != {k: existing["fields"].get(k, "") for k in fields} or not set(tags) <= set(existing["tags"]):
+        anki("updateNote", note={"id": existing["id"], "fields": fields, "tags": tags})
+        mark += "🔄"
+    return mark
+
+
+def find_renamed(text: str, orphans: dict[str, dict]) -> str | None:
+    """綴りを直した行に対応する、Anki にだけ残っている古いカードを探す。"""
+    by_lower = {t.lower(): t for t in orphans}
+    match = difflib.get_close_matches(text.lower(), list(by_lower), n=1, cutoff=0.85)
+    return by_lower[match[0]] if match else None
 
 
 def with_retry(fn, attempts: int = 3):
@@ -372,60 +411,106 @@ def with_retry(fn, attempts: int = 3):
             time.sleep(2 * (i + 1))
 
 
+def generate_missing(deck_dir: Path, regenerate: bool, client_factory) -> tuple[dict[str, Card], int]:
+    """inbox.txt のうち cards.md にない行を AI で作り、cards.md に保存する。"""
+    cards_path = deck_dir / "cards.md"
+    entries = parse_inbox(deck_dir / "inbox.txt")
+    # cards.md は inbox.txt の行だけを inbox.txt の順に持つ（消した行・別デッキへ移した行は落とす）
+    loaded = load_cards(cards_path)
+    cards = {e.text: loaded[e.text] for e in entries if e.text in loaded}
+    to_generate = [
+        e for e in entries
+        if regenerate or e.text not in cards or e.explanation != cards[e.text].memo
+    ]
+    failed = 0
+    for i, entry in enumerate(to_generate, 1):
+        try:
+            card = with_retry(lambda: generate_card(client_factory(), entry))
+            if card.text != entry.text:
+                fix_inbox_text(deck_dir / "inbox.txt", entry.text, card.text)
+                cards.pop(entry.text, None)
+                print(f"  🔤 スペル修正: {entry.text} → {card.text}")
+            cards[card.text] = card
+            save_cards(cards_path, cards)  # 途中で止まっても作った分は残す
+            print(f"  [{i}/{len(to_generate)}] ✏️  {card.text}")
+        except Exception as e:  # 1件の失敗で全体を止めない
+            failed += 1
+            print(f"  [{i}/{len(to_generate)}] ❌ {entry.text}: {e}", file=sys.stderr)
+    save_cards(cards_path, cards)
+    return cards, failed
+
+
 def main() -> int:
-    parser = argparse.ArgumentParser(description="inbox.txt からカードを作り、cards.md と Anki に反映する")
-    parser.add_argument("inbox", nargs="?", default=DEFAULT_INBOX, help="入力ファイル")
-    parser.add_argument("--cards", default=DEFAULT_CARDS, help="カードの保存先 (cards.md)")
+    parser = argparse.ArgumentParser(description="decks/*/inbox.txt からカードを作り、cards.md と Anki に反映する")
+    parser.add_argument("decks", nargs="*", help="対象のデッキ（ディレクトリ名）。省略で全部")
     parser.add_argument("--regenerate", action="store_true",
-                        help="全カードを AI で作り直す（cards.md の手直しは上書きされる）")
+                        help="カードを AI で作り直す（cards.md の手直しは上書きされる）")
     args = parser.parse_args()
+
+    deck_dirs = sorted(d for d in DECKS_DIR.iterdir() if (d / "inbox.txt").exists())
+    if args.decks:
+        deck_dirs = [d for d in deck_dirs if d.name in args.decks]
+    if not deck_dirs:
+        print(f"{DECKS_DIR} に inbox.txt のあるディレクトリがありません")
+        return 1
 
     try:
         anki("version")
     except httpx.ConnectError:
         print("Anki に接続できません。Anki を起動し、AnkiConnect アドオンを入れてください。")
         return 1
-
-    cards_path = Path(args.cards)
-    cards = load_cards(cards_path)
-    entries = parse_inbox(Path(args.inbox))
-    to_generate = [
-        e for e in entries
-        if args.regenerate or e.text not in cards or e.explanation != cards[e.text].memo
-    ]
     if not PIXABAY_API_KEY:
         print("（PIXABAY_API_KEY が未設定なので画像はスキップします）")
 
-    failed = 0
-    if to_generate:
-        print(f"AI でカードを作成: {len(to_generate)} 件")
-        client = anthropic.Anthropic()
-        for i, entry in enumerate(to_generate, 1):
-            try:
-                cards[entry.text] = with_retry(lambda: generate_card(client, entry))
-                save_cards(cards_path, cards)  # 途中で止まっても作った分は残す
-                print(f"  [{i}/{len(to_generate)}] ✏️  {entry.text}")
-            except Exception as e:  # 1件の失敗で全体を止めない
-                failed += 1
-                print(f"  [{i}/{len(to_generate)}] ❌ {entry.text}: {e}", file=sys.stderr)
-    save_cards(cards_path, cards)
+    client: anthropic.Anthropic | None = None
 
-    ensure_deck_and_note_type()
+    def client_factory() -> anthropic.Anthropic:
+        nonlocal client
+        client = client or anthropic.Anthropic()
+        return client
+
+    ensure_note_type()
     notes = existing_notes()
-    added = updated = 0
-    for card in cards.values():
-        try:
-            mark = with_retry(lambda: sync_card(card, notes.get(card.text)))
-        except Exception as e:
-            failed += 1
-            print(f"  ❌ Anki 反映失敗 {card.text}: {e}", file=sys.stderr)
-            continue
-        if mark:
-            print(f"  {mark} {card.text}")
-            added += mark == "✅"
-            updated += mark == "🔄"
+    failed = added = updated = 0
 
-    print(f"完了: Anki に {added} 件追加, {updated} 件更新, {failed} 件失敗（cards.md: {len(cards)} 件）")
+    generated: list[tuple[Path, dict[str, Card]]] = []
+    for deck_dir in deck_dirs:
+        print(f"■ {deck_name(deck_dir)}  (decks/{deck_dir.name})")
+        cards, gen_failed = generate_missing(deck_dir, args.regenerate, client_factory)
+        failed += gen_failed
+        generated.append((deck_dir, cards))
+
+    # どの cards.md にもない Anki のカード（綴りを直す前の古いカードなど）
+    active = {t for d in DECKS_DIR.iterdir() if (d / "cards.md").exists() for t in load_cards(d / "cards.md")}
+    orphans = {t: n for t, n in notes.items() if t not in active}
+
+    for deck_dir, cards in generated:
+        deck = deck_name(deck_dir)
+        print(f"■ {deck} → Anki")
+        anki("createDeck", deck=deck)
+        for card in cards.values():
+            existing = notes.get(card.text)
+            if existing is None and (old := find_renamed(card.text, orphans)):
+                # 綴りを直す前のカードを引き継ぐ。音声・画像は新しい綴りで作り直す
+                existing = orphans.pop(old)
+                existing["fields"] = {k: v for k, v in existing["fields"].items() if k not in ("Audio", "Image")}
+                print(f"  🔤 Anki のカードを引き継ぎ: {old} → {card.text}")
+            try:
+                mark = with_retry(lambda: sync_card(card, existing, deck))
+            except Exception as e:
+                failed += 1
+                print(f"  ❌ Anki 反映失敗 {card.text}: {e}", file=sys.stderr)
+                continue
+            if mark:
+                print(f"  {mark} {card.text}")
+                added += "✅" in mark
+                updated += "✅" not in mark
+        print(f"  cards.md: {len(cards)} 件")
+
+    if orphans:
+        print(f"⚠️  Anki にだけあるカード（どの inbox.txt にもない）: {', '.join(orphans)}")
+        print("   不要なら Anki のブラウザで削除してください")
+    print(f"完了: Anki に {added} 件追加, {updated} 件更新・移動, {failed} 件失敗")
     return 1 if failed else 0
 
 

@@ -1,0 +1,48 @@
+# 末尾に1行ずつ追加していく（文法）。「英語 | 説明」、説明は省略可（AIが書く）
+# # で始まる行はメモ。日付や先生の名前に使える
+
+# 2026-11-17 Teacher Anna
+Noun
+Pronoun
+Verb
+Adverb
+Adjective
+Subject
+Infinitive Verb
+Preposition
+Conjunction
+Interjection
+Linking Verb
+Sentence | 主語と動詞を含み、完結した意味を表す語のまとまり
+Paragraph | 1つのテーマについて書かれた、複数の文のまとまり
+Topic sentence | 段落の主題を示す文。多くは段落の最初にある
+Article | 冠詞（a / an / the）。名詞の前につけて限定や種類を示す語
+Determiner | 限定詞。名詞の前で意味を限定する語（a, the, this, some など）
+Auxiliary verb | 助動詞（do / have / be）。他の動詞を助けて疑問文や時制などを作る動詞
+Modal verb | 法助動詞（can / should / will など）。可能・義務・推量などを表す助動詞
+Gerund | 動名詞。動詞の -ing 形で名詞の働きをするもの
+Participle | 分詞。動詞の -ing 形や過去分詞で形容詞や進行形・完了形などを作るもの
+Relative pronoun | 関係代名詞（who / which / that など）。名詞を後ろから説明する節を導く語
+Possessive | 所有格・所有代名詞（my / mine / his など）。所有関係を表す語
+Demonstrative | 指示詞（this / that / these / those）。対象を指し示す語
+Quantifier | 数量詞（some / many / few / all など）。数や量を表す語
+Phrase | 句。2語以上のまとまりで、主語と動詞を含まないもの
+Clause | 節。主語と動詞を含む語のまとまり
+Object | 目的語。動詞の動作の対象となる語句
+Complement | 補語。主語や目的語の意味を補って説明する語句
+Predicate | 述語。主語について述べる部分（動詞とその後ろの要素）
+Transitive verb | 他動詞。目的語を必要とする動詞
+Intransitive verb | 自動詞。目的語を必要としない動詞
+Antecedent | 先行詞。関係代名詞などが指す、前に出てくる名詞
+Tense | 時制。動作や状態がいつのことかを表す動詞の形
+Present perfect | 現在完了。過去から現在までの経験・完了・継続を表す形（have / has + 過去分詞）
+Passive voice | 受動態。主語が動作を受ける形（be + 過去分詞）
+Conditional | 条件文。「もし〜なら…」を表す文の形
+Subjunctive | 仮定法。事実と異なることや願望などを表す動詞の形
+Countable noun | 可算名詞。数えられる名詞（a book, two books）
+Uncountable noun | 不可算名詞。数えられない名詞（water, information）
+Comparative | 比較級。2つのものを比べる形（bigger, more beautiful など）
+Superlative | 最上級。3つ以上のものの中で最も…であることを表す形（biggest, most beautiful など）
+Phrasal verb | 句動詞。動詞と副詞・前置詞の組み合わせで別の意味を表すもの（give up など）
+Idiom | 慣用句。単語の意味の組み合わせからは分からない決まった表現
+
